@@ -1,0 +1,56 @@
+﻿<ion-view view-title="途八哥">
+    <ion-nav-buttons side="right">
+        <div id="search-bar">
+            <div class="item item-input-inset" style="background-color:transparent;border-width:0px;margin-top:0px;padding:0px;">
+                <label class="item-input-wrapper" id="search-input" style="background-color:transparent;border:1px solid white;">
+                    <i class="icon ion-search placeholder-icon" style="color:white;"></i>
+                    <input type="text" placeholder="" ng-model="query" ng-change="search()">
+                </label>
+            </div>
+        </div>
+    </ion-nav-buttons>
+  <ion-content class="padding">
+      <ion-slide-box auto-play="true" does-continue="true" slide-interval="2000">
+          <ion-slide ng-repeat="slider in sliders">
+              <div style="">
+                <img ng-src="{{slider.img}}" style="width:100%">
+              </div>
+          </ion-slide>
+      </ion-slide-box>
+      <ion-list>
+          <ion-item class="" ng-repeat="chat in chats" type="item-text-wrap">
+              <!--<img ng-src="{{chat.face}}">
+              <h2>{{chat.name}}</h2>
+              <p>{{chat.lastText}}</p>
+              <i class="icon ion-chevron-right icon-accessory"></i>-->
+              <div class="">
+                  <div class="">
+                      <img class="full-image" src="img/banners/1.jpg">
+                      <p>
+                          奇幻欧洲之旅
+                      </p>
+                      <p>
+                          <a href="#" class="subdued">1 赞</a>
+                          <a href="#" class="subdued">5 评论</a>
+                      </p>
+                  </div>
+
+                  <div class="item tabs tabs-icon-left" style="background-color:white;">
+                      <a class="tab-item" href="#" style="color:darkgray">
+                          <i class="icon ion-thumbsup" style="color:darkgray"></i>
+                          赞
+                      </a>
+                      <a class="tab-item" href="#" style="color:darkgray">
+                          <i class="icon ion-chatbox" style="color:darkgray"></i>
+                          评论
+                      </a>
+                      <a class="tab-item" href="#" style="color:darkgray">
+                          <i class="icon ion-share" style="color:darkgray"></i>
+                          分享
+                      </a>
+                  </div>
+              </div>
+          </ion-item>
+      </ion-list>
+  </ion-content>
+</ion-view>
