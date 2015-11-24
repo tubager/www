@@ -1,4 +1,4 @@
-﻿<ion-view view-title="途八哥">
+<ion-view view-title="途八哥">
     <ion-nav-buttons side="right">
         <div id="search-bar">
             <div class="item item-input-inset" style="background-color:transparent;border-width:0px;margin-top:0px;padding:0px;">
@@ -24,30 +24,16 @@
               <p>{{chat.lastText}}</p>
               <i class="icon ion-chevron-right icon-accessory"></i>-->
               <div class="">
-                  <div class="">
-                      <img class="full-image" src="img/banners/1.jpg">
-                      <p>
-                          奇幻欧洲之旅
-                      </p>
-                      <p>
-                          <a href="#" class="subdued">1 赞</a>
-                          <a href="#" class="subdued">5 评论</a>
-                      </p>
-                  </div>
-
-                  <div class="item tabs tabs-icon-left" style="background-color:white;">
-                      <a class="tab-item" href="#" style="color:darkgray">
-                          <i class="icon ion-thumbsup" style="color:darkgray"></i>
-                          赞
-                      </a>
-                      <a class="tab-item" href="#" style="color:darkgray">
-                          <i class="icon ion-chatbox" style="color:darkgray"></i>
-                          评论
-                      </a>
-                      <a class="tab-item" href="#" style="color:darkgray">
-                          <i class="icon ion-share" style="color:darkgray"></i>
-                          分享
-                      </a>
+                  <div class="article-tile">
+                      <img class="full-image" src="{{chat.img}}">
+                      <div class="tile-text">
+	                      <div class="tile-title">
+	                          {{chat.title}}
+	                      </div>
+	                      <div class="tile-sub-title">
+	                      	{{chat.subTitle}}
+	                      </div>
+                      </div>
                   </div>
               </div>
           </ion-item>

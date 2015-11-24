@@ -1,1 +1,23 @@
 /* Empty. Add your own CSS if you like */
+.article-tile{
+	position: relative;
+}
+.tile-text{
+	position: absolute;
+	background-color:rgba(211,211,211,0.7);
+	width: 100%;
+	bottom: 0px;
+	padding: 10px;
+}
+.tile-title{
+	color:white;
+	font-size: 18px;
+	text-align: center;
+	overflow: hidden;
+	text-overflow:ellipsis;
+}
+.tile-sub-title{
+	color:white;
+	text-align: center;
+	font-size: 14px;
+}
