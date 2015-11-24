@@ -1,8 +1,12 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading) {
+.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading, Recommendation) {
     $scope.sliders = Sliders.all();
     $scope.chats = Sliders.chats();
+    Recommendation.getArticles().then(function(data){
+    	console.log(data);
+    	$scope.chats = data;
+    });
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
     	alert("device ready");

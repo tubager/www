@@ -96,23 +96,23 @@ angular.module('starter.services', [])
     var chats = [{
         id: 0,
         title: '【东京北海道】初夏花未央',
-        subTitle: '晓稀 ',
-        img: 'img/banners/1.jpg'
+        description: '晓稀 ',
+        coverImg: 'img/banners/1.jpg'
     }, {
         id: 1,
         title: '【天空之城】阳春三月 携死党．奔赴女儿国（完结）',
-        subTitle: '天空之城',
-        img: 'img/banners/2.jpg'
+        description: '天空之城',
+        coverImg: 'img/banners/2.jpg'
     }, {
         id: 2,
         title: '#消夏计划#I TAIWAN臺灣向南走向北走',
-        subTitle: 'ar_vinny ',
-        img: 'img/banners/3.jpg'
+        description: 'ar_vinny ',
+        coverImg: 'img/banners/3.jpg'
     }, {
         id: 3,
         title: '沙丁鱼大迁徙－狂野南非 海盗王.基德作品',
-        subTitle: '海盗王基德',
-        img: 'img/banners/4.jpg'
+        description: '海盗王基德',
+        coverImg: 'img/banners/4.jpg'
     }];
 
     return {
@@ -123,5 +123,25 @@ angular.module('starter.services', [])
             return chats;
         }
     };
+})
+.service('Recommendation',function($http){
+	var articles;
+	return{
+		getArticles: function(){
+			var req = {
+					method: 'GET',
+					url: 'http://jsonplaceholder.typicode.com/users',
+					//url: 'http://localhost:8080/book/99c8ca6c63f14b3f8bb85510bcdaae04',
+					headers: {
+						'Content-Type': 'application/json;charset=UTF-8',
+					    'X-Auth-Token': "abcde"
+					}
+			};
+			return $http.get('http://localhost:8080/books',{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"},data:{}}).then(function(items){
+				articles = items.data;
+				return articles;
+			});
+		}
+	}
 });
 
