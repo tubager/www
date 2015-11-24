@@ -4,12 +4,11 @@ angular.module('starter.controllers', [])
     $scope.sliders = Sliders.all();
     $scope.chats = Sliders.chats();
     Recommendation.getArticles().then(function(data){
-    	console.log(data);
     	$scope.chats = data;
     });
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
-    	alert("device ready");
+    	
     	$ionicLoading.show({
             template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Acquiring location!'
         });
@@ -18,10 +17,15 @@ angular.module('starter.controllers', [])
                 timeout: 20000,
                 maximumAge: 0
             };
+    	if(!$cordovaGeolocation){
+    		alert("$cordovaGeolocation not found");
+    	}
     	$cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
             var lat  = position.coords.latitude;
             var long = position.coords.longitude;
-            alert(JSON.stringify(position));
+            $ionicLoading.hide();
+            alert(lat);
+            alert(long);
              
         }, function(err) {
             $ionicLoading.hide();
