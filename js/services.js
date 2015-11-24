@@ -1,4 +1,4 @@
-angular.module('starter.services', [])
+angular.module('starter.services', ['ionic', 'ngCordova'])
 
 .factory('Chats', function() {
   // Might use a resource here that returns a JSON array
@@ -143,5 +143,31 @@ angular.module('starter.services', [])
 			});
 		}
 	}
-});
+})
+.factory('CameraService',['$q','$cordovaCamera', function($q,$cordovaCamera){
+	return {
+		getPicture: function(){
+			var options = { 
+		            quality : 75, 
+		            destinationType : Camera.DestinationType.DATA_URL, 
+		            sourceType : Camera.PictureSourceType.CAMERA, 
+		            allowEdit : true,
+		            encodingType: Camera.EncodingType.JPEG,
+		            targetWidth: 300,
+		            targetHeight: 300,
+		            popoverOptions: CameraPopoverOptions,
+		            saveToPhotoAlbum: false
+		        };
+			var q = $q.defer();
+			$cordovaCamera.getPicture(options).then(function(imageData) {
+				q.resolve(imageData);
+	        }, function(err) {
+	            // An error occured. Show a message to the user
+	        	q.reject(err);
+	        });
+			
+			return q.promise;
+		}
+	}
+}]);
 

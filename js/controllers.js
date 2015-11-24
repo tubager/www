@@ -34,14 +34,23 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('ChatsCtrl', function($scope, Chats) {
-  $scope.chats = Chats.all();
-  $scope.remove = function(chat) {
-    Chats.remove(chat);
-  }
-  $scope.slideHasChanged = function (idx) {
-
-  }
+.controller('ChatsCtrl', function($scope, Chats, CameraService) {
+//  $scope.chats = Chats.all();
+//  $scope.remove = function(chat) {
+//    Chats.remove(chat);
+//  }
+//  $scope.slideHasChanged = function (idx) {
+//
+//  }
+  $scope.getPhoto = function() {
+	  CameraService.getPicture().then(function(imageURI) {
+		  alert(imageURI);
+    }, function(err) {
+    	alert(err);
+    });
+  };
+  
+  
 })
 
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
