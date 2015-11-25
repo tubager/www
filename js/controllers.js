@@ -34,7 +34,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('ChatsCtrl', function($scope, Chats, CameraService) {
+.controller('ChatsCtrl', function($scope, Chats, CameraService, $cordovaMedia, $ionicLoading) {
 //  $scope.chats = Chats.all();
 //  $scope.remove = function(chat) {
 //    Chats.remove(chat);
@@ -42,9 +42,31 @@ angular.module('starter.controllers', [])
 //  $scope.slideHasChanged = function (idx) {
 //
 //  }
+	$scope.images = [];
+	$scope.sounds = [];
+	$scope.videos = [];
+	
+	$scope.play = function(src) {
+		alert(src);
+        var media = new Media(src, null, null, mediaStatusCallback);
+        $cordovaMedia.play(media);
+    }
+ 
+    var mediaStatusCallback = function(status) {
+        if(status == 1) {
+            $ionicLoading.show({template: '正在加载...'});
+        } else {
+            $ionicLoading.hide();
+        }
+    }
+	
   $scope.getPhoto = function() {
 	  CameraService.getPicture().then(function(imageURI) {
-		  alert(imageURI);
+		  //alert(imageURI);
+		  $scope.images.push(imageURI);
+		  if(!$scope.$$phase) {
+				$scope.$apply();
+			  }
     }, function(err) {
     	alert(err);
     });
@@ -53,8 +75,12 @@ angular.module('starter.controllers', [])
   $scope.selectPhoto = function(){
 	  CameraService.selectPicture().then(function(results) {
 		  for (var i = 0; i < results.length; i++) {
-		        alert('Image URI: ' + results[i]);
-		      }
+	        //alert('Image URI: ' + results[i]);
+	        $scope.images.push(results[i]);
+	      }
+		  if(!$scope.$$phase) {
+			$scope.$apply();
+		  }
 	    }, function(err) {
 	    	alert(err);
 	    });
@@ -66,7 +92,11 @@ angular.module('starter.controllers', [])
 		    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
 		        path = mediaFiles[i].fullPath;
 		        // do something interesting with the file
-		        alert(path);
+		        //alert(path);
+		        $scope.images.push(path);
+			    if(!$scope.$$phase) {
+					$scope.$apply();
+				  }
 		    }
 	    }, function(err) {
 	    	alert(err);
@@ -79,7 +109,11 @@ angular.module('starter.controllers', [])
 		    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
 		        path = mediaFiles[i].fullPath;
 		        // do something interesting with the file
-		        alert(path);
+		        //alert(path);
+		        $scope.videos.push(path);
+			    if(!$scope.$$phase) {
+					$scope.$apply();
+				  }
 		    }
 	    }, function(err) {
 	    	alert(err);
@@ -92,7 +126,11 @@ angular.module('starter.controllers', [])
 		    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
 		        path = mediaFiles[i].fullPath;
 		        // do something interesting with the file
-		        alert(path);
+		        //alert(path);
+		        $scope.sounds.push(path);
+			    if(!$scope.$$phase) {
+					$scope.$apply();
+				  }
 		    }
 	    }, function(err) {
 	    	alert(err);

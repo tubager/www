@@ -6,6 +6,7 @@
     <button class="button button-full button-calm" ng-click="selectPhoto()">
 	 帅哥，选照片吧！
 	</button>
+	
     <button class="button button-full button-balanced" ng-click="captureImage()">
 	 抓拍照片
 	</button>
@@ -15,5 +16,14 @@
     <button class="button button-full button-royal" ng-click="captureAudio()">
 	 录声音
 	</button>
+	<p ng-repeat="img in images">
+		<img ng-src="{{img}}" style="width:100%;" />
+	</p>
+	<div ng-repeat="sound in sounds">
+		<audio src="{{sound}}" style="width:100%;" controls="controls"></audio>
+	</div>
+	<p ng-repeat="video in videos">
+		<video ng-src="{{video}}" style="width:100%;" controls="controls"></video>
+	</p>
   </ion-content>
 </ion-view>
