@@ -144,12 +144,12 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		}
 	}
 })
-.factory('CameraService',['$q','$cordovaCamera', function($q,$cordovaCamera){
+.factory('CameraService',['$q','$cordovaCamera','$cordovaImagePicker','$cordovaCapture', function($q,$cordovaCamera,$cordovaImagePicker,$cordovaCapture){
 	return {
 		getPicture: function(){
 			var options = { 
 		            quality : 75, 
-		            destinationType : Camera.DestinationType.DATA_URL, 
+		            destinationType : Camera.DestinationType.FILE_URL, 
 		            sourceType : Camera.PictureSourceType.CAMERA, 
 		            allowEdit : true,
 		            encodingType: Camera.EncodingType.JPEG,
@@ -165,6 +165,66 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 	            // An error occured. Show a message to the user
 	        	q.reject(err);
 	        });
+			
+			return q.promise;
+		},
+		
+		selectPicture: function(){
+			var options = {
+				   maximumImagesCount: 10,
+				   width: 0,
+				   height: 0,
+				   quality: 80
+			};
+			var q = $q.defer();
+			$cordovaImagePicker.getPictures(options).then(function(results) {
+				q.resolve(results);
+	        }, function(err) {
+	            // An error occured. Show a message to the user
+	        	q.reject(err);
+	        });
+			
+			return q.promise;
+		},
+		
+		captureImage : function(){
+			var options = { limit: 1 };
+			var q = $q.defer();
+			$cordovaCapture.captureImage(options).then(function(imageData) {
+		      // Success! Image data is here
+				q.resolve(imageData);
+		    }, function(err) {
+		      // An error occurred. Show a message to the user
+	        	q.reject(err);
+		    });
+			
+			return q.promise;
+		},
+		
+		captureAudio : function(){
+			var options = { limit: 1, duration: 10 };
+			var q = $q.defer();
+			$cordovaCapture.captureAudio(options).then(function(audioData) {
+		      // Success! Image data is here
+				q.resolve(audioData);
+		    }, function(err) {
+		      // An error occurred. Show a message to the user
+	        	q.reject(err);
+		    });
+			
+			return q.promise;
+		},
+		
+		captureVideo : function(){
+			var options = { limit: 1, duration: 15 };
+			var q = $q.defer();
+			$cordovaCapture.captureVideo(options).then(function(videoData) {
+		      // Success! Image data is here
+				q.resolve(videoData);
+		    }, function(err) {
+		      // An error occurred. Show a message to the user
+	        	q.reject(err);
+		    });
 			
 			return q.promise;
 		}
