@@ -1,78 +1,5 @@
 angular.module('starter.services', ['ionic', 'ngCordova'])
 
-.factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
-
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
-  }, {
-    id: 2,
-    name: 'Andrew Jostlin',
-    lastText: 'Did you get the ice cream?',
-    face: 'https://pbs.twimg.com/profile_images/491274378181488640/Tti0fFVJ.jpeg'
-  }, {
-    id: 3,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
-  }, {
-    id: 4,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'https://pbs.twimg.com/profile_images/491995398135767040/ie2Z_V6e.jpeg'
-  }];
-  
-  var sliders = [{
-      id: 0,
-      name: 'Ben Sparrow',
-      img: 'img/banners/1.jpg'
-  }, {
-      id: 1,
-      name: 'Max Lynx',
-      img: 'img/banners/1.jpg'
-  }, {
-      id: 2,
-      name: 'Andrew Jostlin',
-      img: 'img/banners/1.jpg'
-  }, {
-      id: 3,
-      name: 'Adam Bradleyson',
-      img: 'img/banners/1.jpg'
-  }, {
-      id: 4,
-      name: 'Perry Governor',
-      img: 'img/banners/1.jpg'
-  }];
-
-  return {
-      allSliders: function(){
-          return sliders;
-      },
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
-        }
-      }
-      return null;
-    }
-  };
-})
 .factory('Sliders', function () {
     // Might use a resource here that returns a JSON array
 
@@ -124,6 +51,41 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
         }
     };
 })
+.service('FileService', ['$q','$cordovaFileTransfer', '$cordovaImagePicker', function($q, $cordovaFileTransfer,$cordovaImagePicker){
+	return {
+		uploadImage: function(){
+			var options = {
+					   maximumImagesCount: 1,
+					   width: 0,
+					   height: 0,
+					   quality: 80
+				};
+				var q = $q.defer();
+				$cordovaImagePicker.getPictures(options).then(function(results) {
+					var fileURL = results[0];
+					var options = new FileUploadOptions();
+					options.fileKey = "file";
+					options.fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
+					options.mimeType = "image/jpeg";
+					options.httpMethod = "POST";
+					options.params = {"name": options.fileName};
+					options.headers={'X-Auth-Token':'abcde'};
+					
+					var ft = new FileTransfer();
+					ft.upload(fileURL, encodeURI("http://192.168.31.218:8080/upload"), function(r){
+						q.resolve(r);
+					}, function(error){
+						q.reject(error);
+					}, options);
+		        }, function(err) {
+		            // An error occured. Show a message to the user
+		        	q.reject(err);
+		        });
+				
+				return q.promise;
+		}
+	}
+}])
 .service('Recommendation',function($http){
 	var articles;
 	return{
@@ -137,7 +99,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 					    'X-Auth-Token': "abcde"
 					}
 			};
-			return $http.get('http://localhost:8080/books',{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"},data:{}}).then(function(items){
+			return $http.get('http://192.168.31.218:8080/books',{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"},data:{}}).then(function(items){
 				articles = items.data;
 				return articles;
 			});

@@ -34,7 +34,7 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('ChatsCtrl', function($scope, Chats, CameraService, $cordovaMedia, $ionicLoading) {
+.controller('ChatsCtrl', function($scope, CameraService, $cordovaMedia, $ionicLoading, FileService) {
 //  $scope.chats = Chats.all();
 //  $scope.remove = function(chat) {
 //    Chats.remove(chat);
@@ -59,6 +59,14 @@ angular.module('starter.controllers', [])
             $ionicLoading.hide();
         }
     }
+    
+    $scope.uploadPhoto = function(){
+    	FileService.uploadImage().then(function(r){
+    		alert(r.response);
+    	}, function(err){
+    		alert(JSON.stringify(err));
+    	});
+    };
 	
   $scope.getPhoto = function() {
 	  CameraService.getPicture().then(function(imageURI) {
