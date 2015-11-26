@@ -106,7 +106,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		}
 	}
 })
-.factory('CameraService',['$q','$cordovaCamera','$cordovaImagePicker','$cordovaCapture', function($q,$cordovaCamera,$cordovaImagePicker,$cordovaCapture){
+.factory('CameraService',['$q','$cordovaCamera','$cordovaImagePicker','$cordovaCapture','$cordovaBarcodeScanner', function($q,$cordovaCamera,$cordovaImagePicker,$cordovaCapture,$cordovaBarcodeScanner){
 	return {
 		getPicture: function(){
 			var options = { 
@@ -183,6 +183,19 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			$cordovaCapture.captureVideo(options).then(function(videoData) {
 		      // Success! Image data is here
 				q.resolve(videoData);
+		    }, function(err) {
+		      // An error occurred. Show a message to the user
+	        	q.reject(err);
+		    });
+			
+			return q.promise;
+		},
+		
+		scanQrcode: function(){
+			var q = $q.defer();
+			$cordovaBarcodeScanner.scan().then(function(scanData) {
+		      // Success! Image data is here
+				q.resolve(scanData);
 		    }, function(err) {
 		      // An error occurred. Show a message to the user
 	        	q.reject(err);

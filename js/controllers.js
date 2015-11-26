@@ -145,6 +145,14 @@ angular.module('starter.controllers', [])
 	    });
   };
   
+  $scope.scanQrcode = function(){
+	  CameraService.scanQrcode().then(function(result){
+		  alert(JSON.stringify(result));
+	  },function(err){
+			alert(JSON.stringify(err));
+	  });
+  };
+  
 })
 
 .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
