@@ -72,7 +72,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 					options.headers={'X-Auth-Token':'abcde'};
 					
 					var ft = new FileTransfer();
-					ft.upload(fileURL, encodeURI("http://192.168.31.218:8080/upload"), function(r){
+					ft.upload(fileURL, encodeURI("http://120.25.68.228:8080/upload"), function(r){
 						q.resolve(r);
 					}, function(error){
 						q.reject(error);
@@ -99,7 +99,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 					    'X-Auth-Token': "abcde"
 					}
 			};
-			return $http.get('http://192.168.31.218:8080/books',{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"},data:{}}).then(function(items){
+			return $http.get('http://120.25.68.228:8080/books',{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"},data:{}}).then(function(items){
 				articles = items.data;
 				return articles;
 			});
