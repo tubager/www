@@ -86,22 +86,28 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		}
 	}
 }])
-.service('Recommendation',function($http){
+.service('ArticleService',function($http){
 	var articles;
 	return{
 		getArticles: function(){
-			var req = {
-					method: 'GET',
-					url: 'http://jsonplaceholder.typicode.com/users',
-					//url: 'http://localhost:8080/book/99c8ca6c63f14b3f8bb85510bcdaae04',
-					headers: {
-						'Content-Type': 'application/json;charset=UTF-8',
-					    'X-Auth-Token': "abcde"
-					}
-			};
+//			var req = {
+//					method: 'GET',
+//					url: 'http://jsonplaceholder.typicode.com/users',
+//					//url: 'http://localhost:8080/book/99c8ca6c63f14b3f8bb85510bcdaae04',
+//					headers: {
+//						'Content-Type': 'application/json;charset=UTF-8',
+//					    'X-Auth-Token': "abcde"
+//					}
+//			};
 			return $http.get('http://120.25.68.228:8080/books',{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"},data:{}}).then(function(items){
 				articles = items.data;
 				return articles;
+			});
+		},
+		
+		uploadArticle: function(article){
+			return $http.post('http://localhost:8080/book',article,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"}}).then(function(d){
+				return d;
 			});
 		}
 	}

@@ -1,9 +1,9 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading, Recommendation) {
+.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading, ArticleService) {
     $scope.sliders = Sliders.all();
     $scope.chats = Sliders.chats();
-    Recommendation.getArticles().then(function(data){
+    ArticleService.getArticles().then(function(data){
     	$scope.chats = data;
     });
     document.addEventListener("deviceready", onDeviceReady, false);
@@ -155,8 +155,61 @@ angular.module('starter.controllers', [])
   
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
+.controller('ChatDetailCtrl', function($scope, $stateParams, ArticleService) {
+  //$scope.chat = Chats.get($stateParams.chatId);
+	$scope.chat = {
+			title: "【小青岛】2015第一场说走就走的旅行",
+			description: "ihuhu酱总体上要靠谱恩",
+			coverImg: "img/banners/4.jpg",
+			uuid: "12345678900000",
+			paragraphs:[
+			            {
+			            	uuid: "0549c83b33a1440c8785e295dccee2c0",
+			            	index: 1,
+			            	title: "一些碎碎念",
+			            	text:"我一直认为，女生一定要多旅行、多拍照片，很庆幸爱上摄影，这几年也去了不少地方，拍了很多风景，也给自己留下许多照片，每个时期都有不同的样子，我们不能让时间静止，但抓不住的留下瞬间也是好的！所以我每次旅行自己都会拍很多照片，记录那个时候我的样子！相信多年之后再回过头看自己拍过的照片、写过的游记，一定会感谢当时的自己！",
+			            	timestamp: "2015-06-19 8:00:00",
+			            	images:[
+			            	        {
+			            	        	url: "http://file29.mafengwo.net/M00/30/40/wKgBpVVkJYaAZe2CABTkFKvtNtg03.groupinfo.w680.jpeg",
+			            	        	title: ""
+			            	        }
+			            	        ],
+			            	vedio: null,
+			            	audio: null
+			            },
+			            {
+			            	uuid: "0549c83b33a1440c8785e295dccee2c1",
+			            	index: 2,
+			            	title: "三大教堂、劈柴院、天幕城",
+			            	text: "",
+			            	timestamp: "2015-06-19 9:00:00",
+			            	images:[
+			            	        {
+			            	        	url: "http://file29.mafengwo.net/M00/2D/6A/wKgBpVVkItSAWRWpAAjeYbm0x8E36.groupinfo.w680.jpeg",
+			            	        	title: "青岛天主教堂 "
+			            	        },
+			            	        {
+			            	        	url: "http://file29.mafengwo.net/M00/2D/72/wKgBpVVkItmAGhAnAAstvs2yW8M11.groupinfo.w680.jpeg",
+			            	        	title: "江苏路基督教堂 "
+			            	        },
+			            	        {
+			            	        	url: "http://file29.mafengwo.net/M00/4F/E6/wKgBpVVnTneALNc3AAneKqgTp1w63.groupinfo.w680.jpeg",
+			            	        	title: "劈柴院 "
+			            	        }
+			            	        ],
+			            	vedio: null,
+			            	audio: null
+			            }
+			           ]
+	};
+	
+	$scope.upload = function(article){
+		console.log(article);
+		ArticleService.uploadArticle(article).then(function(data){
+			console.log(data);
+		});
+	};
 })
 
 .controller('AccountCtrl', function($scope) {
