@@ -39,6 +39,7 @@ angular.module('starter.controllers', [])
 	$scope.articles = articleList;
 	$scope.images = [];
 	$scope.sounds = [];
+	$scope.text = "aaa\nbbb";
 	
 	$scope.removeImg = function(index){
 		$scope.images.splice(index,1);
@@ -48,6 +49,10 @@ angular.module('starter.controllers', [])
 	$scope.removeSound = function(index){
 		$scope.sounds.splice(index,1);
 		$scope.$apply();
+	};
+	
+	$scope.save = function(){
+		console.log($scope.text);
 	};
 	
 	$ionicModal.fromTemplateUrl('templates/photo-modal.html', {
