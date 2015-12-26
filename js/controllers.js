@@ -33,7 +33,88 @@ angular.module('starter.controllers', [])
         });
     }
 })
-
+.controller('NewArticleCtrl', function($scope, $ionicModal, LocalFileService, CameraService){
+	var articleList = LocalFileService.listArticles();
+	articleList.splice(0,0,{'id': 'new', 'title': '新建游记'});
+	$scope.articles = articleList;
+	$scope.images = [];
+	$scope.sounds = [];
+	
+	$scope.removeImg = function(index){
+		$scope.images.splice(index,1);
+		$scope.$apply();
+	};
+	
+	$scope.removeSound = function(index){
+		$scope.sounds.splice(index,1);
+		$scope.$apply();
+	};
+	
+	$ionicModal.fromTemplateUrl('templates/photo-modal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.modal = modal;
+    });
+	
+	$scope.openSelect = function(){
+		$scope.modal.show();
+	};
+	
+	$scope.closeSelect = function(){
+		$scope.modal.hide();
+	};
+	
+	$scope.selectPhoto = function(){
+		$scope.modal.hide();
+	    CameraService.selectPicture().then(function(results) {
+		  for (var i = 0; i < results.length; i++) {
+	        //alert('Image URI: ' + results[i]);
+	        $scope.images.push({'img':results[i], 'title': ''});
+	      }
+		  if(!$scope.$$phase) {
+			$scope.$apply();
+		  }
+	    }, function(err) {
+	    	alert(err);
+	    });
+    };
+	
+	$scope.captureImage = function(){
+		$scope.modal.hide();
+	    CameraService.captureImage().then(function(mediaFiles) {
+		    var i, path, len;
+		    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+		        path = mediaFiles[i].fullPath;
+		        // do something interesting with the file
+		        //alert(path);
+		        $scope.images.push({'img':path, 'title':''});
+			    if(!$scope.$$phase) {
+					$scope.$apply();
+				  }
+		    }
+	    }, function(err) {
+	    	alert(err);
+	    });
+    };
+	
+	$scope.captureAudio  = function(){
+	  CameraService.captureAudio ().then(function(mediaFiles) {
+		    var i, path, len;
+		    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+		        path = mediaFiles[i].fullPath;
+		        // do something interesting with the file
+		        //alert(path);
+		        $scope.sounds.push(path);
+			    if(!$scope.$$phase) {
+					$scope.$apply();
+				  }
+		    }
+	    }, function(err) {
+	    	alert(err);
+	    });
+  };
+})
 .controller('ChatsCtrl', function($scope, CameraService, $cordovaMedia, $ionicLoading, FileService) {
 //  $scope.chats = Chats.all();
 //  $scope.remove = function(chat) {
@@ -155,7 +236,7 @@ angular.module('starter.controllers', [])
   
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, ArticleService) {
+.controller('ChatDetailCtrl', function($scope, $stateParams, $ionicModal, ArticleService) {
   //$scope.chat = Chats.get($stateParams.chatId);
 	$scope.chat = {
 			title: "【小青岛】2015第一场说走就走的旅行",
@@ -204,11 +285,38 @@ angular.module('starter.controllers', [])
 			           ]
 	};
 	
+	$ionicModal.fromTemplateUrl('templates/share-modal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.modal = modal;
+    });
+	
 	$scope.upload = function(article){
 		console.log(article);
 		ArticleService.uploadArticle(article).then(function(data){
 			console.log(data);
 		});
+	};
+	
+	$scope.preview = function(article){
+		self.location = "preview/leaves/leaves1.html";
+	};
+	
+	$scope.openShare = function(){
+		$scope.modal.show();
+	};
+	
+	$scope.closeShare = function(){
+		$scope.modal.hide();
+	};
+	
+	$scope.shareToTimeline = function(){
+		$scope.modal.hide();
+	};
+	
+	$scope.shareToFriends = function(){
+		$scope.modal.hide();
 	};
 })
 

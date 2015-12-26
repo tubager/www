@@ -17,12 +17,13 @@
               </div>
           </ion-slide>
       </ion-slide-box>
-      <ion-list>
-          <ion-item class="" ng-repeat="chat in chats" type="item-text-wrap" href="#/tab/articles/{{chat.uuid}}">
-              <!--<img ng-src="{{chat.face}}">
-              <h2>{{chat.name}}</h2>
-              <p>{{chat.lastText}}</p>
-              <i class="icon ion-chevron-right icon-accessory"></i>-->
+	  <div class="short-cut">
+          <a href="#" class="footItem1"><span class="entypo-heart icon ion-folder"></span>游记本</a>
+          <a href="#" class="footItem2"><span class="entypo-user icon ion-ios-book"></span>当前游记</a>
+          <a href="#" class="footItem3"><span class="entypo-plus icon ion-ios-paw"></span>我的足迹</a>
+      </div>
+      <ion-list class="article-list">
+          <ion-item class="" ng-repeat="chat in chats" type="item-text-wrap" href="#/tab/article/{{chat.uuid}}">
               <div class="">
                   <div class="article-tile">
                       <img class="full-image" src="{{chat.coverImg}}">

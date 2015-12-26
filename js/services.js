@@ -86,6 +86,13 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		}
 	}
 }])
+.service('LocalFileService', function(){
+	return {
+		listArticles: function(){
+			return [{'id': '11111', 'title': '川北大漠行'}, {'id': '22222', 'title':'云南玉龙雪山'}];
+		}
+	}
+})
 .service('ArticleService',function($http){
 	var articles;
 	return{
