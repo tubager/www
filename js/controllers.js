@@ -33,26 +33,118 @@ angular.module('starter.controllers', [])
         });
     }
 })
-.controller('NewArticleCtrl', function($scope, $ionicModal, LocalFileService, CameraService){
-	var articleList = LocalFileService.listArticles();
-	articleList.splice(0,0,{'id': 'new', 'title': '新建游记'});
-	$scope.articles = articleList;
+.controller('NewArticleCtrl', function($scope, $ionicModal, $stateParams, LocalFileService, CameraService){
+	var articleList = [];
+	var currentArticle = null;
+	var currentParagraph = null;
+	LocalFileService.listArticles().then(function(data){
+		articleList = data.articles;
+		articleList.splice(0,0,{'id': 'new', 'title': '新建游记'});
+		$scope.articles = articleList;
+		if(!data.currentArticle){
+			$scope.data.article = $scope.articles[0];
+		}
+		else{
+			for(var i=0; i<articleList.length; i++){
+				if(articleList[i].id == data.currentArticle){
+					$scope.data.article = $scope.articles[i];
+					break;
+				}
+			}
+		}
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	}, function(err){
+		alert(JSON.stringify(err));
+	});
 	$scope.images = [];
 	$scope.sounds = [];
-	$scope.text = "aaa\nbbb";
+	$scope.data = {"text": "", "location": ""};
+	
+	function doSave(){
+		var p = currentParagraph || {};
+		if(!p.uuid){
+			p.uuid = "P" + util.getUuid();
+		}
+		p.bookUuid = $scope.data.article.id;
+		//p.title = "";
+		p.text = $scope.data.text;
+		p.images = $scope.images;
+		p.sounds = $scope.sounds;
+		p.location = $scope.data.location;
+		
+		LocalFileService.readArticle($scope.data.article.id).then(function(success){
+			var currentArticle = success;
+			var found = false;
+			for(var i=0; i<currentArticle.paragraphs.length; i++){
+				if(currentArticle.paragraphs[i].uuid == p.uuid){
+					found = true;
+					currentArticle.paragraphs[i] = p;
+					break;
+				}
+			}
+			if(!found){
+				currentArticle.paragraphs.push(p);
+			}
+			LocalFileService.saveArticle(currentArticle, currentArticle.uuid).then(function(success){
+				
+			}, function(error){
+				
+			});
+		}, function(error){
+			alert(JSON.stringify(error));
+		});
+		
+	}
 	
 	$scope.removeImg = function(index){
 		$scope.images.splice(index,1);
-		$scope.$apply();
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
 	};
 	
 	$scope.removeSound = function(index){
 		$scope.sounds.splice(index,1);
-		$scope.$apply();
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
 	};
 	
 	$scope.save = function(){
-		console.log($scope.text);
+		if($stateParams.id == "new"){
+			$scope.titleModel.show();
+		}
+		else{
+			doSave();
+		}
+	};
+	
+	$scope.confirmNewArticle = function(){
+		$scope.titleModel.hide();
+		var title = $scope.data.articleTitle;
+		var id = "A" + util.getUuid();
+		$scope.articles.splice(1,0,{'id': id, 'title': title});
+		$scope.data.article = $scope.articles[1];
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+		var articleList = [];
+		for(var i=1; i<$scope.articles.length; i++){
+			articleList.push($scope.articles[i]);
+		}
+		LocalFileService.saveArticle({'uuid': id, 'title': title, 'paragraphs': []}, id).then(function(success){
+			LocalFileService.saveArticleList({'articles':articleList, 'currentArticle': id}).then(function(success){
+				//alert("save sucessful");
+				doSave();
+			}, function(err){
+				alert(JSON.stringify(err));
+			});
+		}, function(error){
+			alert(JSON.stringify(error));
+		});
+		
 	};
 	
 	$ionicModal.fromTemplateUrl('templates/photo-modal.html', {
@@ -62,12 +154,23 @@ angular.module('starter.controllers', [])
       $scope.modal = modal;
     });
 	
+	$ionicModal.fromTemplateUrl('templates/newarticle-modal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.titleModel = modal;
+    });
+	
 	$scope.openSelect = function(){
 		$scope.modal.show();
 	};
 	
 	$scope.closeSelect = function(){
 		$scope.modal.hide();
+	};
+	
+	$scope.closeNewArticle = function(){
+		$scope.titleModel.hide();
 	};
 	
 	$scope.selectPhoto = function(){

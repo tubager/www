@@ -1,0 +1,12 @@
+﻿<ion-modal-view>
+	<ion-header-bar class="bar-calm fix-buttons">
+	  <h1 class="title">新建游记</h1>
+	  <a class="button" ng-click="closeNewArticle()">取消</a>
+	</ion-header-bar>
+	<ion-content>
+		<label class="item item-input">
+			<input ng-model="data.articleTitle" type="text" placeholder="游记标题" value="{{data.articleTitle}}"/>
+		</label>
+		<button class="button button-full button-stable icon ion-images" style="margin-bottom:10px;" ng-click="confirmNewArticle()">确定</button>
+	</ion-content>
+</ion-modal-view>

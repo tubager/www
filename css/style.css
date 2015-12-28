@@ -29,27 +29,22 @@
 }
 .short-cut{
 	position: relative;
+	height:80px;
 }
 
 [class^="footItem"] {
 	display: inline-block; 
-	width: 32.5%; 
+	width: 49.5%; 
 	padding: 15px 0; 
 	text-align: center; 
 	color: white; 
 	font-size: 1.1em; 
 }
 [class^="footItem"] span { display: block; font-size: 1.6em; margin-bottom: 5px; color: #fff; }
-.footItem1 { background: #33cd5f; }
+.footItem1 { background: #33cd5f; position: absolute; left: 0px;}
 .footItem1:hover { background: #5bcee2; }
-.footItem2 { background: #f27935; }
+.footItem2 { background: #f27935; position: absolute; right: 0px;}
 .footItem2:hover { background: #f6a172; }
-.footItem3 { 
-	background: #1fbba6; 
-	position: absolute;
-	right: 0px;
-}
-.footItem3:hover { background: #63d0c1; }
 
 .article-list .item-content{
 	padding: 0px;

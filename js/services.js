@@ -86,13 +86,65 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		}
 	}
 }])
-.service('LocalFileService', function(){
+.service('LocalFileService', ['$q','$cordovaFile', function($q, $cordovaFile){
 	return {
 		listArticles: function(){
-			return [{'id': '11111', 'title': '川北大漠行'}, {'id': '22222', 'title':'云南玉龙雪山'}];
+			var q = $q.defer();
+			$cordovaFile.checkFile(cordova.file.dataDirectory, "my_article.json")
+			.then(function (success) {
+				$cordovaFile.readAsText(cordova.file.dataDirectory, "my_article.json")
+				.then(function (txt) {
+					var articles = JSON.parse(txt);
+					q.resolve(articles);
+				}, function (err) {
+					q.reject(err);
+				});
+			}, function (error) {
+				$cordovaFile.createFile(cordova.file.dataDirectory, "my_article.json", true)
+				.then(function (success) {
+					q.resolve({'articles':[], 'currentArticle': null});
+				}, function (err) {
+					q.reject(err);
+				});
+			});
+			return q.promise;
+		},
+		
+		saveArticleList: function(articleList){
+			var q = $q.defer();
+			$cordovaFile.writeExistingFile(cordova.file.dataDirectory, "my_article.json", JSON.stringify(articleList))
+			.then(function (success) {
+				q.resolve(success);
+			}, function (error) {
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		
+		readArticle: function(uuid){
+			var q = $q.defer();
+			$cordovaFile.readAsText(cordova.file.dataDirectory, uuid + ".json")
+			.then(function (txt) {
+				var article = JSON.parse(txt);
+				q.resolve(article);
+			}, function (err) {
+				q.reject(err);
+			});
+			return q.promise;
+		},
+		
+		saveArticle: function(article, uuid){
+			var q = $q.defer
+			$cordovaFile.writeFile(cordova.file.dataDirectory, uuid + ".json", JSON.stringify(article), true)
+			.then(function (success) {
+				q.resolve(success);
+			}, function (error) {
+				q.reject(error);
+			});
+			return q.promise;
 		}
 	}
-})
+}])
 .service('ArticleService',function($http){
 	var articles;
 	return{

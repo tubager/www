@@ -15,8 +15,8 @@
 			<div class="input-label" style="padding: 0px;">
 				<p class="icon ion-ios-book" style="font-size:1.5em; margin-right:5px; color: #11c1f3"></p>
 			</div>
-			<select style="position: relative;">
-				<option ng-repeat="a in articles" value="{{a.id}}">{{a.title}}</option>
+			<select ng-model="data.article" style="position: relative;" ng-options="article.title for article in articles">
+				
 			</select>
 		</label>
 		<div class="imageSection">
@@ -29,7 +29,7 @@
 				</div>
 				<img ng-src="{{i.img}}" style="width:100%;" />
 				<label class="item item-input" style="margin-top:-5px;">
-					<input type="text" placeholder="图片描述" value="{{i.title}}"/>
+					<input ng-model="i.title" type="text" placeholder="图片描述" value="{{i.title}}"/>
 				</label>
 			</div>
 			<button class="button button-block button-stable icon ion-image" ng-click="openSelect()">添加照片</button>
@@ -38,8 +38,8 @@
 			<div style="border-bottom:1px solid #11c1f3;margin-bottom:5px;margin-top:10px;">
 				<label class="" style="color:#11c1f3;"><span class="icon ion-ios-list-outline" style="font-size:1.5em; margin-right:5px;"></span>记录此刻您的心情</label>
 			</div>
-			<div id="templateText" contenteditable="true" style="min-height: 3em;border: 1px solid #a0b3d6;">
-				{{text}}
+			<div id="templateText" ng-model="data.text" contenteditable="true" style="min-height: 3em;border: 1px solid #a0b3d6;">
+				{{data.text}}
 			</div>
 		</div>
 		<div class="audioSection">
@@ -57,7 +57,7 @@
 				<label class="" style="color:#FFC900;"><span class="icon ion-android-pin" style="font-size:1.5em; margin-right:5px;"></span>人过留痕</label>
 			</div>
 			<label class="item item-input">
-				<input type="text" placeholder="我的位置">
+				<input ng-model="data.location" type="text" placeholder="我的位置" value="{{data.location}}"/>
 			</label>
 		</div>
 	</ion-content>
