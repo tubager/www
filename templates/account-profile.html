@@ -1,0 +1,52 @@
+﻿<ion-view view-title="Account-Profile">
+    <ion-nav-buttons side="left">
+        <button class="button back-button button-icon ion-arrow-left-c header-item" ng-click="$ionicGoBack()">
+        </button>
+    </ion-nav-buttons>
+
+    <ion-nav-buttons side="secondary">
+        <button class="button button-icon ion-checkmark-circled header-item" ng-click="save()">
+        </button>
+    </ion-nav-buttons>
+
+    <ion-content>
+        <ion-list>
+            <ion-item class="item-remove-animate item-avatar-right" type="item-text-wrap" ng-click="showActionsheet()">
+                <img src="img/img_5236.jpg">
+                <h2>{{user.username}}</h2>
+            </ion-item>
+
+            <ion-item class="item-icon-right" ng-click="openModal()">
+                NickName
+                <span class="item-note">
+                    {{user.nickname}}
+                </span>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item-icon-right" href="#/profile-password">
+                Password
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item item-divider">
+            </ion-item>
+
+            <ion-item class="item-icon-right" href="#/profile-gender">
+                Gender
+                <span class="item-note">
+                    {{user.gender}}
+                </span>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item-icon-right" href="#/profile-lastword">
+                What's Up
+                <span class="item-note">
+                    {{user.lastWord}}
+                </span>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>

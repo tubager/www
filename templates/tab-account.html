@@ -1,9 +1,24 @@
-<ion-view view-title="Account">
-  <ion-content>
-    <ion-list>
-    <ion-toggle  ng-model="settings.enableFriends">
-        Enable Friends
-    </ion-toggle>
-    </ion-list>
+
+<ion-view  hide-nav-bar="true" style="z-index: 9999" view-title="个人中心">
+  <ion-content class="padding">
+
+    <div class="unlogin" tapmode="" onclick="">
+      <img src="img/users/t1.jpg">
+        <a href="#/sign-in"><button class="login">立即登录</button></a>
+    </div>
+    <div class="user-img">
+      <img src="img/users/user_avatar_unlogin@2x.png">
+    </div>
+    <div class="content">
+      <nav>
+        <ul>
+          <li><a href="">关注</a></li>
+          <li><a href="#/tab/account/profile">下载</a></li>
+          <li><a href="#/tab/account/settings">设置</a></li>
+          <li><a href="">版本更新</a></li>
+        </ul>
+      </nav>
+    </div>
+
   </ion-content>
 </ion-view>

@@ -51,6 +51,30 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
         }
     };
 })
+
+.service('LoginService', function ($q) {
+	return {
+		signIn: function (name, pw) {
+			var deferred = $q.defer();
+			var promise = deferred.promise;
+
+			if (name == 'olivia' && pw == 'secret') {
+				deferred.resolve('Welcome ' + name + '!');
+			} else {
+				deferred.reject('Wrong credentials.');
+			}
+			promise.success = function (fn) {
+				promise.then(fn);
+				return promise;
+			}
+			promise.error = function (fn) {
+				promise.then(null, fn);
+				return promise;
+			}
+			return promise;
+		}
+	}
+})
 .service('FileService', ['$q','$cordovaFileTransfer', '$cordovaImagePicker', function($q, $cordovaFileTransfer,$cordovaImagePicker){
 	return {
 		uploadImage: function(){
@@ -94,12 +118,20 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			.then(function (success) {
 				$cordovaFile.readAsText(cordova.file.dataDirectory, "my_article.json")
 				.then(function (txt) {
-					var articles = JSON.parse(txt);
+					var articles;
+					if(txt == ""){
+						articles = {'articles':[], 'currentArticle': null};
+					}
+					else{
+						articles = JSON.parse(txt);
+					}
 					q.resolve(articles);
 				}, function (err) {
+					alert("can not read file");
 					q.reject(err);
 				});
 			}, function (error) {
+				alert("creating new file");
 				$cordovaFile.createFile(cordova.file.dataDirectory, "my_article.json", true)
 				.then(function (success) {
 					q.resolve({'articles':[], 'currentArticle': null});
@@ -134,7 +166,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		},
 		
 		saveArticle: function(article, uuid){
-			var q = $q.defer
+			var q = $q.defer();
 			$cordovaFile.writeFile(cordova.file.dataDirectory, uuid + ".json", JSON.stringify(article), true)
 			.then(function (success) {
 				q.resolve(success);

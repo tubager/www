@@ -1,0 +1,57 @@
+﻿<ion-view view-title="Account-Settings">
+    <ion-nav-buttons side="left">
+        <button class="button back-button button-icon ion-arrow-left-c header-item" ng-click="$ionicGoBack()">
+        </button>
+    </ion-nav-buttons>
+
+    <ion-nav-buttons side="secondary">
+        <button class="button button-icon ion-checkmark-circled header-item" ng-click="save()">
+        </button>
+    </ion-nav-buttons>
+
+    <ion-content>
+        <ion-list>
+
+            <ion-item class="item-icon-right">
+                Clear Cache
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item-icon-right">
+                Clear History
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item item-divider">
+            </ion-item>
+
+            <ion-item class="item-icon-right">
+                <ion-toggle ng-model="settings.enableAutoSync">
+                    Auto Sync
+                </ion-toggle>
+            </ion-item>
+
+            <ion-item class="item item-divider">
+            </ion-item>
+
+            <ion-item class="item-icon-right">
+                Help & Feedback
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item-icon-right">
+                About
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item item-divider">
+            </ion-item>
+
+            <ion-item class="item-icon-right">
+                Logout
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+        </ion-list>
+    </ion-content>
+</ion-view>

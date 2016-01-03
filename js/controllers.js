@@ -29,11 +29,199 @@ angular.module('starter.controllers', [])
              
         }, function(err) {
             $ionicLoading.hide();
-            alert(JSON.stringify(err));
         });
     }
 })
-.controller('NewArticleCtrl', function($scope, $ionicModal, $stateParams, LocalFileService, CameraService){
+	
+	.controller('AcntSettingsCtrl', function ($scope) { })
+
+	.controller('SignInCtrl', function ($scope, LoginService, $ionicPopup, $state) {
+		$scope.user = {};
+		$scope.submitted = false;
+
+		$scope.signIn = function () {
+			if ($scope.signin_form.$valid) {
+				LoginService.signIn($scope.user.username, $scope.user.password).success(function (user) {
+					$state.go('tab.home');
+				}).error(function (user) {
+					var alertPopup = $ionicPopup.alert({
+						title: 'Login failed!',
+						template: 'Please check your credentials!'
+					});
+				});
+			} else {
+				$scope.signin_form.submitted = true;
+			}
+		};
+	})
+
+	.controller('SignUpCtrl', function ($scope, $state) {
+		$scope.submitted = false;
+
+		$scope.signUp = function (user) {
+			if ($scope.signup_form.$valid) {
+
+				console.log('Sign-Up', user);
+				$state.go('tab.home');
+			} else {
+				$scope.signup_form.submitted = true;
+			}
+		};
+	})
+	.controller('ForgetPwdCtrl', function ($scope, $state) {
+		$scope.submitted = false;
+
+		$scope.forgetPwd = function (user) {
+			if ($scope.forget_pwd_form.$valid) {
+				console.log('Forget-Password', user);
+				$state.go('reclaimpassword');
+			} else {
+				$scope.forget_pwd_form.submitted = true;
+			}
+		};
+	})
+
+	.controller('ReclaimPwdCtrl', function ($scope) {
+	})
+
+
+	.controller('AcntProfileCtrl', function ($scope, $ionicActionSheet, $timeout, $ionicModal) {
+		$scope.user = {
+			username: 'OliviaHu',
+			nickname: 'Olivia',
+			email:'oliviahu@gmail.com',
+			password: 'secret',
+			gender: 'Female',
+			region: 'China',
+			lastWord: 'Enjoy Your Journey!'
+		};
+		$scope.tempname = $scope.user.username;
+		$ionicModal.fromTemplateUrl('templates/profile-nickname.html', {
+			scope: $scope,
+			animation: 'slide-in-up'
+		}).then(function(modal) {
+			$scope.modal = modal;
+		});
+		$scope.openModal = function () {
+			$scope.modal.show();
+		};
+		$scope.closeModal = function() {
+			$scope.modal.hide();
+		};
+		$scope.saveModal = function () {
+			$scope.user.username = $scope.tempname;
+			$scope.modal.hide();
+		};
+		$scope.$on('$destroy', function() {
+			$scope.modal.remove();
+		});
+		$scope.$on('modal.hide', function() {
+		});
+		$scope.$on('modal.removed', function() {
+		});
+
+		$scope.showActionsheet = function () {
+			// Show the action sheet
+			var hideSheet = $ionicActionSheet.show({
+				buttons: [
+					{ text: 'Take Photo' },
+					{ text: 'Choose from Photos' }
+				],
+				cancelText: 'Cancel',
+				cancel: function () {
+					// add cancel code..
+					console.log('CANCELLED');
+				},
+				buttonClicked: function (index) {
+					console.log('BUTTON CLICKED', index);
+					return true;
+				}
+			});
+
+			// For example's sake, hide the sheet after two seconds
+			$timeout(function () {
+				hideSheet();
+			}, 2000);
+		};
+	})
+
+	.controller('ProfileGenderCtrl', function ($scope) {
+		$scope.user = {
+			gender: 'Female'
+		};
+		$scope.genderList = [
+			{ text: "Female", value: "Female" },
+			{ text: "Male", value: "Male" }
+		];
+
+		$scope.genderUpdate = function (item) {
+			console.log("Selected Gender, text:", item.text, "value:", item.value);
+			$state.go('tab.profile');
+		};
+	})
+
+	.controller('ProfilePasswordCtrl', function ($scope) {
+		$scope.user = {
+			password: 'secret'
+		};
+		$scope.oldPassword = "";
+		$scope.newPassword = "";
+
+		$scope.submitted = false;
+
+		$scope.updatePassword = function () {
+			if ($scope.updatepassword_form.$valid) {
+				// �����ύ
+				console.log('Update-Password', user);
+				$state.go('tab.profile');
+			} else {
+				$scope.updatepassword_form.submitted = true;
+			}
+		};
+
+		$scope.genderUpdate = function () {
+			console.log('Profile', user);
+			$state.go('tab.profile');
+		};
+	})
+
+	.controller('ProfileLastWordCtrl', function ($scope) {
+		$scope.user = {
+			lastWord: 'Enjoy Your Journey!'
+		};
+
+		$scope.templastword = $scope.user.lastWord;
+
+		$scope.closeModal = function() {
+			$scope.modal.hide();
+		};
+		$scope.saveModal = function () {
+			$scope.user.lastWord = $scope.templastword;
+			$scope.modal.hide();
+		};
+
+		$scope.updateLastword = function () {
+			console.log('Profile-lastword', user);
+			$state.go('tab.profile');
+		};
+	})
+.controller('MyArticlesCtrl', function($scope, $ionicModal,LocalFileService){
+	var articleList = [];
+	//$scope.articles = [{title: "AAAAAAA", id: "1111"}, {title: "BBBBBB", id: "222222"}];
+	//return;
+	$scope.articles = [];
+	
+	LocalFileService.listArticles().then(function(data){
+		articleList = data.articles;
+		$scope.articles = articleList;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	}, function(err){
+		alert(JSON.stringify(err));
+	});
+})
+.controller('NewArticleCtrl', function($scope, $ionicModal, $state, $stateParams, $cordovaGeolocation, LocalFileService, CameraService){
 	var articleList = [];
 	var currentArticle = null;
 	var currentParagraph = null;
@@ -60,19 +248,66 @@ angular.module('starter.controllers', [])
 	});
 	$scope.images = [];
 	$scope.sounds = [];
-	$scope.data = {"text": "", "location": ""};
+	$scope.data = {"text": "", "location": {"name": "", "latitude": "", "longitude": ""}};
+	
+	if($stateParams.id != "new"){
+		var articleUuid = $stateParams.id.split(",")[0];
+		var paragraphUuid = $stateParams.id.split(",")[1];
+		LocalFileService.readArticle(articleUuid).then(function(success){
+			var currentArticle = success;
+			var p = null;
+			currentArticle.paragraphs.map(function(para){
+				if(para.uuid == paragraphUuid){
+					p = para;
+					currentParagraph = para;
+				}
+			});
+			if(p != null){
+				$scope.images = p.images;
+				$scope.sounds = p.sounds;
+				$scope.data.text = p.text;
+				$scope.data.location = p.location;
+				if(!$scope.$$phase) {
+					$scope.$apply();
+				}
+			}
+			
+		}, function(error){
+			alert(JSON.stringify(error));
+		});
+	}
+	
+	var posOptions = {
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 0
+            };
+	$cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+		var lat  = position.coords.latitude;
+		var long = position.coords.longitude;
+		$scope.data.location.latitude = lat;
+		$scope.data.location.longitude = long;
+//            alert(lat);
+//            alert(long);
+		 
+	}, function(err) {
+		$scope.data.location.latitude = 0;
+		$scope.data.location.longitude = 0;
+	});
 	
 	function doSave(){
+		var textNode = document.getElementById("templateText");
 		var p = currentParagraph || {};
 		if(!p.uuid){
 			p.uuid = "P" + util.getUuid();
 		}
 		p.bookUuid = $scope.data.article.id;
 		//p.title = "";
-		p.text = $scope.data.text;
+		p.text = textNode.innerText;//$scope.data.text;
 		p.images = $scope.images;
 		p.sounds = $scope.sounds;
 		p.location = $scope.data.location;
+		p.timestamp = new Date();
 		
 		LocalFileService.readArticle($scope.data.article.id).then(function(success){
 			var currentArticle = success;
@@ -87,8 +322,9 @@ angular.module('starter.controllers', [])
 			if(!found){
 				currentArticle.paragraphs.push(p);
 			}
+			
 			LocalFileService.saveArticle(currentArticle, currentArticle.uuid).then(function(success){
-				
+				$state.go('timeline', {id: currentArticle.uuid});
 			}, function(error){
 				
 			});
@@ -113,7 +349,7 @@ angular.module('starter.controllers', [])
 	};
 	
 	$scope.save = function(){
-		if($stateParams.id == "new"){
+		if($scope.data.article.id == "new"){
 			$scope.titleModel.show();
 		}
 		else{
@@ -124,8 +360,9 @@ angular.module('starter.controllers', [])
 	$scope.confirmNewArticle = function(){
 		$scope.titleModel.hide();
 		var title = $scope.data.articleTitle;
+		var description = $scope.data.articleDesc;
 		var id = "A" + util.getUuid();
-		$scope.articles.splice(1,0,{'id': id, 'title': title});
+		$scope.articles.splice(1,0,{'id': id, 'title': title, 'description': description});
 		$scope.data.article = $scope.articles[1];
 		if(!$scope.$$phase) {
 			$scope.$apply();
@@ -134,9 +371,8 @@ angular.module('starter.controllers', [])
 		for(var i=1; i<$scope.articles.length; i++){
 			articleList.push($scope.articles[i]);
 		}
-		LocalFileService.saveArticle({'uuid': id, 'title': title, 'paragraphs': []}, id).then(function(success){
+		LocalFileService.saveArticle({'uuid': id, 'title': title, 'description': description, 'paragraphs': []}, id).then(function(success){
 			LocalFileService.saveArticleList({'articles':articleList, 'currentArticle': id}).then(function(success){
-				//alert("save sucessful");
 				doSave();
 			}, function(err){
 				alert(JSON.stringify(err));
@@ -178,7 +414,7 @@ angular.module('starter.controllers', [])
 	    CameraService.selectPicture().then(function(results) {
 		  for (var i = 0; i < results.length; i++) {
 	        //alert('Image URI: ' + results[i]);
-	        $scope.images.push({'img':results[i], 'title': ''});
+	        $scope.images.push({'url':results[i], 'title': ''});
 	      }
 		  if(!$scope.$$phase) {
 			$scope.$apply();
@@ -196,7 +432,7 @@ angular.module('starter.controllers', [])
 		        path = mediaFiles[i].fullPath;
 		        // do something interesting with the file
 		        //alert(path);
-		        $scope.images.push({'img':path, 'title':''});
+		        $scope.images.push({'url':path, 'title':''});
 			    if(!$scope.$$phase) {
 					$scope.$apply();
 				  }
@@ -344,8 +580,60 @@ angular.module('starter.controllers', [])
   
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, $ionicModal, ArticleService) {
-  //$scope.chat = Chats.get($stateParams.chatId);
+.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, ArticleService, LocalFileService) {
+  $scope.chat = {};
+	var articleId = $stateParams.id;
+	if(articleId == "current"){
+		LocalFileService.listArticles().then(function(data){
+			if(data.currentArticle){
+				LocalFileService.readArticle(data.currentArticle).then(function(data){
+					$scope.chat = data;
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+				}, function(error){
+					alert(JSON.stringify(error));
+				});
+			}
+		}, function(err){
+			alert(JSON.stringify(err));
+		});
+	}
+	else{
+		LocalFileService.readArticle(articleId).then(function(data){
+			$scope.chat = data;
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
+		}, function(error){
+			alert(JSON.stringify(error));
+		});
+	}
+	
+	$scope.removeParagraph = function(uuid){
+		var idx = -1;
+		for(var i=0; i<$scope.chat.paragraphs.length; i++){
+			if($scope.chat.paragraphs[i].uuid == uuid){
+				idx = i;
+				break;
+			}
+		}
+		if(idx < 0){
+			return;
+		}
+		$scope.chat.paragraphs.splice(idx, 1);
+		LocalFileService.saveArticle($scope.chat, $scope.chat.uuid).then(function(success){
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
+		}, function(error){
+			
+		});
+	};
+	$scope.editParagraph = function(articleUuid, paragraphUuid){
+		$state.go('editor', {id: articleUuid + "," + paragraphUuid});
+	};
+	/*
 	$scope.chat = {
 			title: "【小青岛】2015第一场说走就走的旅行",
 			description: "ihuhu酱总体上要靠谱恩",
@@ -392,7 +680,7 @@ angular.module('starter.controllers', [])
 			            }
 			           ]
 	};
-	
+	*/
 	$ionicModal.fromTemplateUrl('templates/share-modal.html', {
       scope: $scope,
       animation: 'slide-in-up'

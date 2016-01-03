@@ -37,9 +37,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     templateUrl: "templates/tabs.html"
   })
   .state('timeline',{
+	  cache: false,
 	  url: '/timeline/:id',
       templateUrl: 'templates/timeline.html',
-      controller: 'ChatDetailCtrl'
+      controller: 'TimelineCtrl'
+  })
+  .state('myarticles',{
+	  cache: false,
+	  url: '/myarticles',
+      templateUrl: 'templates/my-articles.html',
+      controller: 'MyArticlesCtrl'
   })
 
   // Each tab has its own nav history stack:
@@ -59,6 +66,67 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       templateUrl: 'templates/editor.html',
       controller: 'NewArticleCtrl'
     })
+
+    .state('tab.settings', {
+      url: '/account/settings',
+      views: {
+        'tab-account': {
+          templateUrl: 'templates/account-settings.html',
+          controller: 'AcntSettingsCtrl'
+        }
+      }
+    })
+
+    .state('signin', {
+      url: '/sign-in',
+      templateUrl: 'templates/sign-in.html',
+      controller: 'SignInCtrl'
+    })
+
+    .state('signup', {
+      url: '/sign-up',
+      templateUrl: 'templates/sign-up.html',
+      controller: 'SignUpCtrl'
+    })
+
+      .state('forgotpassword', {
+        url: '/forgot-password',
+        templateUrl: 'templates/forgot-password.html',
+        controller: 'ForgetPwdCtrl'
+      })
+
+      .state('reclaimpassword', {
+        url: '/reclaim-password',
+        templateUrl: 'templates/reclaim-password.html',
+        controller: 'ReclaimPwdCtrl'
+      })
+      .state('tab.profile', {
+        url: '/account/profile',
+        views: {
+          'tab-account': {
+            templateUrl: 'templates/account-profile.html',
+            controller: 'AcntProfileCtrl'
+          }
+        }
+      })
+
+      .state('profilegender', {
+        url: '/profile-gender',
+        templateUrl: 'templates/profile-gender.html',
+        controller: 'ProfileGenderCtrl'
+      })
+
+      .state('profilepassword', {
+        url: '/profile-password',
+        templateUrl: 'templates/profile-password.html',
+        controller: 'ProfilePasswordCtrl'
+      })
+
+      .state('profilelastword', {
+        url: '/profile-lastword',
+        templateUrl: 'templates/profile-lastword.html',
+        controller: 'ProfileLastWordCtrl'
+      })
 	/*
     .state('tab.chat-detail', {
       url: '/article/:id',

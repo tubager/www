@@ -1,0 +1,26 @@
+﻿<ion-modal-view view-title="What's up">
+
+    <ion-nav-buttons side="left">
+        <button class="button back-button button-icon ion-arrow-left-c header-item" ng-click="$ionicGoBack()">
+        </button>
+    </ion-nav-buttons>
+
+    <ion-nav-buttons side="secondary">
+        <button class="button button-icon ion-checkmark-circled header-item" ng-click="save()">
+        </button>
+    </ion-nav-buttons>
+    <ion-header-bar>
+        <button class="button button-clear btn-warning" ng-click="closeModal()">Cancel</button>
+        <button class="button button-clear button-positive" ng-click="saveModal()">Save</button>
+    </ion-header-bar>
+    <ion-content>
+        <textarea placeholder="Comments" name="lastword" ng-model="templastword" ng-maxlength="30"></textarea>
+        <div class="error"
+             ng-show="lastword.$dirty && lastword.$invalid">
+            <small class="error"
+                   ng-show="lastword.$error.maxlength">
+                Your lastword cannot be longer than 30 characters
+            </small>
+        </div>
+    </ion-content>
+</ion-modal-view>

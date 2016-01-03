@@ -28,11 +28,11 @@
 		   			<div class="tbg-p-time" style="float: left;margin-top:13px;">{{p.timestamp}}</div>
 		   			<div style="float: right;">
 		   				<span>
-		   					<button class="button button-icon ion-android-create" style="margin-bottom: 15px">
+		   					<button class="button button-icon ion-android-create" style="margin-bottom: 15px" ng-click="editParagraph(chat.uuid, p.uuid)">
         					</button>
 		   					<button class="button button-icon ion-android-add-circle">
         					</button>
-		   					<button class="button button-icon ion-android-remove-circle">
+		   					<button class="button button-icon ion-android-remove-circle" ng-click="removeParagraph(p.uuid)">
         					</button>
 		   				</span>
 					</div>

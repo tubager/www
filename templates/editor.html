@@ -27,7 +27,7 @@
 				<div style="position:absolute;top:0px;width:100%;height:40px;background-color:rgba(211,211,211,0.7);">
 					<a class="button button-icon icon ion-ios-minus-outline button-calm" style="position:absolute;right:0px;" ng-click="removeImg($index)"></a>
 				</div>
-				<img ng-src="{{i.img}}" style="width:100%;" />
+				<img ng-src="{{i.url}}" style="width:100%;" />
 				<label class="item item-input" style="margin-top:-5px;">
 					<input ng-model="i.title" type="text" placeholder="图片描述" value="{{i.title}}"/>
 				</label>
@@ -57,7 +57,7 @@
 				<label class="" style="color:#FFC900;"><span class="icon ion-android-pin" style="font-size:1.5em; margin-right:5px;"></span>人过留痕</label>
 			</div>
 			<label class="item item-input">
-				<input ng-model="data.location" type="text" placeholder="我的位置" value="{{data.location}}"/>
+				<input ng-model="data.location.name" type="text" placeholder="我的位置" value="{{data.location}}"/>
 			</label>
 		</div>
 	</ion-content>
