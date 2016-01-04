@@ -52,26 +52,41 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
     };
 })
 
-.service('LoginService', function ($q) {
+.service('LoginService', function ($q, $http) {
 	return {
 		signIn: function (name, pw) {
-			var deferred = $q.defer();
-			var promise = deferred.promise;
-
-			if (name == 'olivia' && pw == 'secret') {
-				deferred.resolve('Welcome ' + name + '!');
-			} else {
-				deferred.reject('Wrong credentials.');
-			}
-			promise.success = function (fn) {
-				promise.then(fn);
-				return promise;
-			}
-			promise.error = function (fn) {
-				promise.then(null, fn);
-				return promise;
-			}
-			return promise;
+			var q = $q.defer();
+			var server = util.server + "auth/signin";
+			var data = {
+				"userName": name,
+				"password": pw,
+				"code": ""
+			};
+			$http.post(server, data, {headers:{'Accept': 'application/json;charset=UTF-8'}}).then(function(response){
+				console.log(response);
+				q.resolve(response);
+			}, function(error){
+				console.log(error);
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		signUp: function(name, pw){
+			var q = $q.defer();
+			var server = util.server + "auth/signup";
+			var data = {
+				"userName": name,
+				"password": pw,
+				"code": ""
+			};
+			$http.post(server, data, {headers:{'Accept': 'application/json;charset=UTF-8'}}).then(function(response){
+				console.log(response);
+				q.resolve(response);
+			}, function(error){
+				console.log(error);
+				q.reject(error);
+			});
+			return q.promise;
 		}
 	}
 })
@@ -112,6 +127,48 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 }])
 .service('LocalFileService', ['$q','$cordovaFile', function($q, $cordovaFile){
 	return {
+		getProfile: function(){
+			var q = $q.defer();
+			$cordovaFile.checkFile(cordova.file.dataDirectory, "profile.json")
+			.then(function (success) {
+				$cordovaFile.readAsText(cordova.file.dataDirectory, "profile.json")
+				.then(function (txt) {
+					var profile;
+					if(txt == ""){
+						profile = {};
+					}
+					else{
+						profile = JSON.parse(txt);
+					}
+					q.resolve(profile);
+				}, function (err) {
+					q.reject(err);
+				});
+			}, function (error) {
+				$cordovaFile.createFile(cordova.file.dataDirectory, "profile.json", true)
+				.then(function (success) {
+					q.resolve({});
+				}, function (error) {
+					q.reject(error);
+				});
+			});
+			return q.promise;
+		},
+		
+		saveProfile: function(profile){
+			var q = $q.defer();
+			if(!profile){
+				profile = {};
+			}
+			$cordovaFile.writeExistingFile(cordova.file.dataDirectory, "profile.json", JSON.stringify(profile))
+			.then(function (success) {
+				q.resolve(success);
+			}, function (error) {
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		
 		listArticles: function(){
 			var q = $q.defer();
 			$cordovaFile.checkFile(cordova.file.dataDirectory, "my_article.json")
@@ -127,16 +184,14 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 					}
 					q.resolve(articles);
 				}, function (err) {
-					alert("can not read file");
 					q.reject(err);
 				});
 			}, function (error) {
-				alert("creating new file");
 				$cordovaFile.createFile(cordova.file.dataDirectory, "my_article.json", true)
 				.then(function (success) {
 					q.resolve({'articles':[], 'currentArticle': null});
-				}, function (err) {
-					q.reject(err);
+				}, function (error) {
+					q.reject(error);
 				});
 			});
 			return q.promise;
@@ -155,7 +210,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		
 		readArticle: function(uuid){
 			var q = $q.defer();
-			$cordovaFile.readAsText(cordova.file.dataDirectory, uuid + ".json")
+			$cordovaFile.readAsText(cordova.file.dataDirectory, uuid + "/" + uuid + ".json")
 			.then(function (txt) {
 				var article = JSON.parse(txt);
 				q.resolve(article);
@@ -167,7 +222,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		
 		saveArticle: function(article, uuid){
 			var q = $q.defer();
-			$cordovaFile.writeFile(cordova.file.dataDirectory, uuid + ".json", JSON.stringify(article), true)
+			$cordovaFile.writeFile(cordova.file.dataDirectory, uuid + "/" + uuid + ".json", JSON.stringify(article), true)
 			.then(function (success) {
 				q.resolve(success);
 			}, function (error) {

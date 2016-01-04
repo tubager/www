@@ -41,13 +41,10 @@ angular.module('starter.controllers', [])
 
 		$scope.signIn = function () {
 			if ($scope.signin_form.$valid) {
-				LoginService.signIn($scope.user.username, $scope.user.password).success(function (user) {
-					$state.go('tab.home');
-				}).error(function (user) {
-					var alertPopup = $ionicPopup.alert({
-						title: 'Login failed!',
-						template: 'Please check your credentials!'
-					});
+				LoginService.signIn($scope.user.username, $scope.user.password).then(function(response){
+					
+				},function(error){
+					
 				});
 			} else {
 				$scope.signin_form.submitted = true;
@@ -55,14 +52,23 @@ angular.module('starter.controllers', [])
 		};
 	})
 
-	.controller('SignUpCtrl', function ($scope, $state) {
+	.controller('SignUpCtrl', function ($scope, $state, $ionicPopup, LoginService) {
 		$scope.submitted = false;
-
 		$scope.signUp = function (user) {
 			if ($scope.signup_form.$valid) {
-
-				console.log('Sign-Up', user);
-				$state.go('tab.home');
+				if(user.password1 != user.password2){
+					var alertPopup = $ionicPopup.alert({
+						title: '注册失败!',
+						template: '两次输入的密码不一致!'
+					});
+				}
+				else{
+					LoginService.signUp(user.username, user.password1).then(function(response){
+						
+					},function(error){
+						
+					});
+				}
 			} else {
 				$scope.signup_form.submitted = true;
 			}
