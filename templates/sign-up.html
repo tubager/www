@@ -1,4 +1,4 @@
-﻿<ion-view view-title="Sign-Up">
+﻿<ion-view view-title="用户注册">
 
     <ion-nav-buttons side="left">
         <button class="button back-button button-icon ion-arrow-left-c header-item" ng-click="$ionicGoBack()">
@@ -13,7 +13,7 @@
     <ion-content>
         <form name="signup_form" novalidate ng-submit="signUp(user)" ng-controller="SignUpCtrl">
                 <div  class="large-12 columns">
-                    <span class="input-label">Username</span>
+                    <span class="input-label">用户名</span>
                     <input type="text" style="background-color:#ddf0f8; width:100%" name="username" ng-model="user.username" ng-minlength="6" ng-maxlength="20"
                            ensure-unique="username" required>
                     <div class="error"
@@ -21,7 +21,7 @@
                             && signup_form.submitted">
                         <small class="error"
                                ng-show="signup_form.username.$error.required">
-                            Your name is required.
+                            请输入用户名.
                         </small>
                         <small class="error"
                                ng-show="signup_form.username.$error.minlength">
@@ -38,14 +38,14 @@
                     </div>
                 </div>
                 <div class="large-12 columns">
-                    <span class="input-label">Email</span>
+                    <span class="input-label">邮箱</span>
                     <input type="email" style="background-color:#ddf0f8; width:100%" name="email" ng-model="user.email" ng-minlength="3" ng-maxlength="20" required>
                     <div class="error"
                          ng-show="signup_form.email.$dirty && signup_form.email.$invalid &&
                             signup_form.submitted">
                         <small class="error"
                                ng-show="signup_form.email.$error.required">
-                            Your email is required.
+                            请输入邮箱.
                         </small>
                         <small class="error"
                                ng-show="signup_form.email.$error.minlength">
@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 <div class="large-12 columns">
-                    <span class="input-label">Password</span>
+                    <span class="input-label">密码</span>
                     <input type="{{type?'text':'password'}}" style="background-color:#ddf0f8; width:100%" name="password" ng-model="user.password" required>
                     <input type="checkbox" ng-model="type"/><span style="color:lightgrey"> Show Passowrd</span>
                     <div class="error"
@@ -70,7 +70,7 @@
                             signup_form.submitted">
                         <small class="error"
                                ng-show="signup_form.password.$error.required">
-                            Your password is required.
+                            密码不能为空.
                         </small>
                         <small class="error"
                                ng-show="signup_form.password.$error.minlength">
@@ -85,7 +85,7 @@
                 <div class="padding">
                     <button class="button button-block button-calm"
                             type="submit">
-                        Sign-Up
+                        注册
                     </button>
                 </div>
 </form>
