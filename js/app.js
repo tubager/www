@@ -62,13 +62,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   })
 
   .state('editor', {
+	  cache: false,
       url: '/editor/:id',
       templateUrl: 'templates/editor.html',
       controller: 'NewArticleCtrl'
     })
 
     .state('tab.settings', {
-      url: '/account/settings',
+      url: '/accountsettings',
       views: {
         'tab-account': {
           templateUrl: 'templates/account-settings.html',
@@ -139,6 +140,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     })
 */
   .state('tab.account', {
+	cache: false,
     url: '/account',
     views: {
       'tab-account': {

@@ -47,7 +47,7 @@
 				<label class="" style="color:#886AEA;"><span class="icon ion-android-microphone" style="font-size:1.5em; margin-right:5px;"></span>不想打字就说话也行</label>
 			</div>
 			<div ng-repeat="sound in sounds">
-				<audio src="{{sound}}" style="width:80%;margin-top:8px;" controls="controls"></audio>
+				<audio src="{{sound.url}}" style="width:80%;margin-top:8px;" controls="controls"></audio>
 				<a class="button button-icon icon ion-ios-minus-outline" style="position:absolute;right:0px;" ng-click="removeSound($index)"></a>
 			</div>
 			<button class="button button-block button-stable icon ion-android-microphone" ng-click="captureAudio()">录音</button>

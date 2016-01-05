@@ -1,13 +1,24 @@
 
 <ion-view  hide-nav-bar="true" style="z-index: 9999" view-title="个人中心">
   <ion-content class="padding" style="background-color:#eee;">
-    <div class="unlogin" tapmode="" onclick="">
-      <img src="img/users/t1.jpg">
-        <a href="#/sign-in"><button class="login">立即登录</button></a>
-    </div>
-    <div class="user-img">
-      <img src="img/users/user_avatar_unlogin@2x.png">
-    </div>
+	<a id="loginLink" href="#/sign-in" style={{loggedIn?"display:none;":"display:block;"}}>
+		<div class="unlogin">
+		  <img src="img/users/t1.jpg"/>
+		  <button class="login">立即登录</button>
+		</div>
+		<div class="user-img">
+		  <img src="img/users/user_avatar_unlogin@2x.png">
+		</div>
+	</a>
+	<a id="infoLink" href="#/tab/accountsettings" style={{loggedIn?"display:block;":"display:none;"}}>
+		<div class="unlogin">
+		  <img src="img/users/t1.jpg"/>
+		  <button class="login">立即登录</button>
+		</div>
+		<div class="user-img">
+		  <img src="img/users/user_avatar_unlogin@2x.png">
+		</div>
+	</a>
     <div class="content">
       <nav style="margin-top:10px; background-color:white;">
         <ul>

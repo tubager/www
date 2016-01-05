@@ -52,7 +52,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
     };
 })
 
-.service('LoginService', function ($q, $http) {
+.service('LoginService', ['$q','$http',  function ($q, $http) {
 	return {
 		signIn: function (name, pw) {
 			var q = $q.defer();
@@ -63,10 +63,9 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 				"code": ""
 			};
 			$http.post(server, data, {headers:{'Accept': 'application/json;charset=UTF-8'}}).then(function(response){
-				console.log(response);
-				q.resolve(response);
+				var token = response.data.token;
+				q.resolve(response.data);
 			}, function(error){
-				console.log(error);
 				q.reject(error);
 			});
 			return q.promise;
@@ -79,9 +78,9 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 				"password": pw,
 				"code": ""
 			};
-			$http.post(server, data, {headers:{'Accept': 'application/json;charset=UTF-8'}}).then(function(response){
-				console.log(response);
-				q.resolve(response);
+			$http.post(server, data).then(function(response){
+				var token = response.data.token;
+				q.resolve(response.data);
 			}, function(error){
 				console.log(error);
 				q.reject(error);
@@ -89,8 +88,8 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			return q.promise;
 		}
 	}
-})
-.service('FileService', ['$q','$cordovaFileTransfer', '$cordovaImagePicker', function($q, $cordovaFileTransfer,$cordovaImagePicker){
+}])
+.service('FileService', ['$q','$cordovaFileTransfer', '$cordovaImagePicker', '$http', function($q, $cordovaFileTransfer,$cordovaImagePicker, $http){
 	return {
 		uploadImage: function(){
 			var options = {
@@ -122,6 +121,10 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		        });
 				
 				return q.promise;
+		},
+		testConnection: function(){
+			var server = util.server + "auth/connection";
+			$http.get(server);
 		}
 	}
 }])
@@ -169,6 +172,23 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			return q.promise;
 		},
 		
+		copyResource: function(data, uuid){
+			var q = $q.defer();
+			var url = data.url;
+			var oldDir = url.substr(0,url.lastIndexOf("/")+1);
+			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
+			var newName = util.getUuid() + "." + fileName.split(".")[1];
+			$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory + uuid + "/", newName)
+			.then(function (success) {
+				// success
+				data.url = cordova.file.dataDirectory + uuid + "/" + newName;
+				q.resolve(data);
+			}, function (error) {
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		
 		listArticles: function(){
 			var q = $q.defer();
 			$cordovaFile.checkFile(cordova.file.dataDirectory, "my_article.json")
@@ -210,7 +230,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		
 		readArticle: function(uuid){
 			var q = $q.defer();
-			$cordovaFile.readAsText(cordova.file.dataDirectory, uuid + "/" + uuid + ".json")
+			$cordovaFile.readAsText(cordova.file.dataDirectory + uuid + "/", uuid + ".json")
 			.then(function (txt) {
 				var article = JSON.parse(txt);
 				q.resolve(article);
@@ -220,13 +240,84 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			return q.promise;
 		},
 		
-		saveArticle: function(article, uuid){
+		checkDir: function(dir){
 			var q = $q.defer();
-			$cordovaFile.writeFile(cordova.file.dataDirectory, uuid + "/" + uuid + ".json", JSON.stringify(article), true)
+			$cordovaFile.checkDir(cordova.file.dataDirectory, dir)
 			.then(function (success) {
 				q.resolve(success);
-			}, function (error) {
-				q.reject(error);
+			}, function (e) {
+				$cordovaFile.createDir(cordova.file.dataDirectory, dir, true)
+				.then(function (s) {
+					q.resolve(s);
+				}, function (error) {
+					q.reject(error);
+				});
+			});
+			return q.promise;
+		},
+		
+		beforeSave: function(article, uuid){
+			var q = $q.defer();
+			var that = this;
+			var count = 0;
+			var flag = false;
+			article.paragraphs.map(function(p){
+				p.images.map(function(i){
+					if(i.url.indexOf(uuid) < 0){
+						count ++;
+						that.copyResource(i, uuid).then(function(s){
+							count--;
+							if(flag && count == 0){
+								q.resolve({});
+							}
+						},function(e){
+							count--;
+							if(flag && count == 0){
+								q.resolve({});
+							}
+						});
+					}
+				});
+				
+				p.sounds.map(function(s){
+					if(s.url.indexOf(uuid) < 0){
+						count ++;
+						that.copyResource(s, uuid).then(function(s){
+							count--;
+							if(flag && count == 0){
+								q.resolve({});
+							}
+						},function(e){
+							count--;
+							if(flag && count == 0){
+								q.resolve({});
+							}
+						});
+					}
+				});
+			});
+			flag = true;
+			if(flag && count == 0){
+				q.resolve({});
+			}
+			return q.promise;
+		},
+		
+		saveArticle: function(article, uuid){
+			var q = $q.defer();
+			var that = this;
+			this.checkDir(uuid).then(function(s){
+				that.beforeSave(article, uuid).then(function(){
+					$cordovaFile.writeFile(cordova.file.dataDirectory + uuid + "/", uuid + ".json", JSON.stringify(article), true)
+					.then(function (success) {
+						q.resolve(success);
+					}, function (error) {
+						q.reject(error);
+					});
+				}, function(){});
+				
+			}, function(e){
+				q.reject(e);
 			});
 			return q.promise;
 		}

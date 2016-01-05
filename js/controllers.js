@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading, ArticleService) {
+.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading, ArticleService,LocalFileService, FileService) {
     $scope.sliders = Sliders.all();
     $scope.chats = Sliders.chats();
     ArticleService.getArticles().then(function(data){
@@ -12,39 +12,58 @@ angular.module('starter.controllers', [])
 //    	$ionicLoading.show({
 //            template: '<ion-spinner icon="bubbles"></ion-spinner><br/>Acquiring location!'
 //        });
+		FileService.testConnection();
+		
     	var posOptions = {
                 enableHighAccuracy: true,
                 timeout: 20000,
                 maximumAge: 0
             };
-    	if(!$cordovaGeolocation){
-    		alert("$cordovaGeolocation not found");
-    	}
     	$cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
             var lat  = position.coords.latitude;
             var long = position.coords.longitude;
-            $ionicLoading.hide();
+            //$ionicLoading.hide();
 //            alert(lat);
 //            alert(long);
              
         }, function(err) {
-            $ionicLoading.hide();
+            //$ionicLoading.hide();
         });
+		
+		LocalFileService.getProfile().then(function(profile){
+			util.profile = profile;
+		}, function(error){});
     }
 })
 	
-	.controller('AcntSettingsCtrl', function ($scope) { })
+	.controller('AcntSettingsCtrl', function ($scope) {
+	})
 
-	.controller('SignInCtrl', function ($scope, LoginService, $ionicPopup, $state) {
+	.controller('SignInCtrl', function ($scope, LoginService, $ionicPopup, $state,LocalFileService) {
 		$scope.user = {};
 		$scope.submitted = false;
 
 		$scope.signIn = function () {
 			if ($scope.signin_form.$valid) {
 				LoginService.signIn($scope.user.username, $scope.user.password).then(function(response){
-					
+					var token = response.token;
+					LocalFileService.getProfile().then(function(profile){
+						profile.token = token;
+						profile.userName = $scope.user.username;
+						util.profile = profile;
+						LocalFileService.saveProfile(profile).then(function(success){
+							
+						}, function(e){
+							
+						});
+					}, function(err){
+						
+					});
 				},function(error){
-					
+					$ionicPopup.alert({
+						title: '登录失败!',
+						template: error.data.message
+					});
 				});
 			} else {
 				$scope.signin_form.submitted = true;
@@ -52,7 +71,7 @@ angular.module('starter.controllers', [])
 		};
 	})
 
-	.controller('SignUpCtrl', function ($scope, $state, $ionicPopup, LoginService) {
+	.controller('SignUpCtrl', function ($scope, $state, $ionicPopup, LoginService,LocalFileService) {
 		$scope.submitted = false;
 		$scope.signUp = function (user) {
 			if ($scope.signup_form.$valid) {
@@ -64,9 +83,24 @@ angular.module('starter.controllers', [])
 				}
 				else{
 					LoginService.signUp(user.username, user.password1).then(function(response){
-						
+						console.log(response);
+						var token = response.token;
+						LocalFileService.getProfile().then(function(profile){
+							profile.token = token;
+							profile.userName = user.username;
+							LocalFileService.saveProfile(profile).then(function(success){
+								
+							}, function(e){
+								
+							});
+						}, function(err){
+							
+						});
 					},function(error){
-						
+						$ionicPopup.alert({
+							title: '注册失败!',
+							template: error.data.message
+						});
 					});
 				}
 			} else {
@@ -211,7 +245,7 @@ angular.module('starter.controllers', [])
 			$state.go('tab.profile');
 		};
 	})
-.controller('MyArticlesCtrl', function($scope, $ionicModal,LocalFileService){
+.controller('MyArticlesCtrl', function($scope, $ionicModal,LocalFileService,$ionicPopup){
 	var articleList = [];
 	//$scope.articles = [{title: "AAAAAAA", id: "1111"}, {title: "BBBBBB", id: "222222"}];
 	//return;
@@ -226,6 +260,34 @@ angular.module('starter.controllers', [])
 	}, function(err){
 		alert(JSON.stringify(err));
 	});
+	
+	$scope.removeArticle = function(uuid){
+		$ionicPopup.confirm({
+			title: '删除确认',
+			template: '确定删除美好回忆？'
+		}).then(function(res) {
+			if(res) {
+				LocalFileService.removeArticle(uuid).then(function(s){
+					for(var i=0; i<$scope.articles.length; i++){
+						var a = $scope.articles[i];
+						if(a.id == uuid){
+							$scope.articles.splice(i,1);
+							break;
+						}
+					}
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+					LocalFileService.saveArticleList($scope.articles);
+				}, function(e){
+					
+				});
+			} else {
+			   
+			}
+		});
+		
+	};
 })
 .controller('NewArticleCtrl', function($scope, $ionicModal, $state, $stateParams, $cordovaGeolocation, LocalFileService, CameraService){
 	var articleList = [];
@@ -455,7 +517,7 @@ angular.module('starter.controllers', [])
 		        path = mediaFiles[i].fullPath;
 		        // do something interesting with the file
 		        //alert(path);
-		        $scope.sounds.push(path);
+		        $scope.sounds.push({'url':path, 'title':''});
 			    if(!$scope.$$phase) {
 					$scope.$apply();
 				  }
@@ -586,7 +648,7 @@ angular.module('starter.controllers', [])
   
 })
 
-.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, ArticleService, LocalFileService) {
+.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, ArticleService, LocalFileService,$ionicPopup) {
   $scope.chat = {};
 	var articleId = $stateParams.id;
 	if(articleId == "current"){
@@ -627,14 +689,24 @@ angular.module('starter.controllers', [])
 		if(idx < 0){
 			return;
 		}
-		$scope.chat.paragraphs.splice(idx, 1);
-		LocalFileService.saveArticle($scope.chat, $scope.chat.uuid).then(function(success){
-			if(!$scope.$$phase) {
-				$scope.$apply();
+		$ionicPopup.confirm({
+			title: '删除确认',
+			template: '确定删除？'
+		}).then(function(res) {
+			if(res) {
+				$scope.chat.paragraphs.splice(idx, 1);
+				LocalFileService.saveArticle($scope.chat, $scope.chat.uuid).then(function(success){
+					if(!$scope.$$phase) {
+						$scope.$apply();
+					}
+				}, function(error){
+					
+				});
+			} else {
+			   
 			}
-		}, function(error){
-			
 		});
+		
 	};
 	$scope.editParagraph = function(articleUuid, paragraphUuid){
 		$state.go('editor', {id: articleUuid + "," + paragraphUuid});
@@ -723,7 +795,11 @@ angular.module('starter.controllers', [])
 })
 
 .controller('AccountCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
-  };
+  $scope.userName = util.profile.userName;
+  if(util.profile.token && util.profile.token != ""){
+	  $scope.loggedIn = true;
+  }
+  else{
+	  $scope.loggedIn = false;
+  }
 });

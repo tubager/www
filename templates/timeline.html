@@ -49,8 +49,9 @@
 		   		<div ng-if="p.vedio != null">
 		   			<video ng-src="{{p.vedio}}" style="width:100%;" controls="controls"></video>
 		   		</div>
-		   		<div ng-if="p.audio != null">
-		   			<audio src="{{p.audio}}" style="width:100%;" controls="controls"></audio>
+		   		<div class="" ng-repeat="sound in p.sounds" type="item-text-wrap">
+		   			<audio src="{{sound.url}}" style="width:80%;margin-top:8px;" controls="controls"></audio>
+		   			<p>{{sound.title}}</p>
 		   		</div>
 	   		</div>
 	   	</div>
