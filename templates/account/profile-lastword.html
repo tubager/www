@@ -1,0 +1,9 @@
+﻿<ion-modal-view view-title="更改签名">
+    <ion-header-bar>
+        <button class="button btn-warning" ng-click="closeSignatureModal()">取消</button>
+        <button class="button button-calm" ng-click="saveSignatureModal()">确定</button>
+    </ion-header-bar>
+	<ion-content style="margin: 10px;">
+		<input ng-model="temp.lastWord" type="text" placeholder="个性签名" value="{{user.lastWord}}"/>
+	</ion-content>
+</ion-modal-view>

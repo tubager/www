@@ -32,7 +32,9 @@ angular.module('starter.controllers', [])
 		
 		LocalFileService.getProfile().then(function(profile){
 			util.profile = profile;
-		}, function(error){});
+		}, function(error){
+			alert(JSON.stringify(error));
+		});
     }
 })
 	
@@ -44,20 +46,15 @@ angular.module('starter.controllers', [])
 		$scope.submitted = false;
 
 		$scope.signIn = function () {
-			if ($scope.signin_form.$valid) {
+			if (true) {
 				LoginService.signIn($scope.user.username, $scope.user.password).then(function(response){
 					var token = response.token;
-					LocalFileService.getProfile().then(function(profile){
-						profile.token = token;
-						profile.userName = $scope.user.username;
-						util.profile = profile;
-						LocalFileService.saveProfile(profile).then(function(success){
-							
-						}, function(e){
-							
-						});
-					}, function(err){
-						
+					util.profile.token = token;
+					util.profile.userName = $scope.user.username;
+					LocalFileService.saveProfile(util.profile).then(function(success){
+						$state.go('tab.account');
+					}, function(e){
+						alert(JSON.stringify(e));
 					});
 				},function(error){
 					$ionicPopup.alert({
@@ -85,16 +82,12 @@ angular.module('starter.controllers', [])
 					LoginService.signUp(user.username, user.password1).then(function(response){
 						console.log(response);
 						var token = response.token;
-						LocalFileService.getProfile().then(function(profile){
-							profile.token = token;
-							profile.userName = user.username;
-							LocalFileService.saveProfile(profile).then(function(success){
-								
-							}, function(e){
-								
-							});
-						}, function(err){
-							
+						util.profile.token = token;
+						util.profile.userName = $scope.user.username;
+						LocalFileService.saveProfile(util.profile).then(function(success){
+							$state.go('tab.account');
+						}, function(e){
+							alert(JSON.stringify(e));
 						});
 					},function(error){
 						$ionicPopup.alert({
@@ -125,124 +118,147 @@ angular.module('starter.controllers', [])
 	})
 
 
-	.controller('AcntProfileCtrl', function ($scope, $ionicActionSheet, $timeout, $ionicModal) {
+	.controller('AcntProfileCtrl', function ($scope, $ionicActionSheet, $ionicModal, CameraService, LocalFileService, LoginService, $state) {
 		$scope.user = {
-			username: 'OliviaHu',
-			nickname: 'Olivia',
-			email:'oliviahu@gmail.com',
-			password: 'secret',
-			gender: 'Female',
-			region: 'China',
-			lastWord: 'Enjoy Your Journey!'
+			userName: util.profile.userName || "",
+			nickName: util.profile.nickName || "",
+			email: util.profile.email || "",
+			gender: util.profile.gender || "M",
+			address: util.profile.address || "",
+			lastWord: util.profile.lastWord || "",
+			img: util.profile.img || "img/img_5236.jpg"
 		};
-		$scope.tempname = $scope.user.username;
-		$ionicModal.fromTemplateUrl('templates/profile-nickname.html', {
+		$scope.temp = {};
+		
+		function saveProfile(){
+			util.profile.nickName = $scope.user.nickName;
+			util.profile.img = $scope.user.img;
+			util.profile.gender = $scope.user.gender;
+			util.profile.lastWord = $scope.user.lastWord;
+			alert(JSON.stringify(util.profile));
+			LocalFileService.saveProfile(util.profile);
+		}
+		
+		$scope.logoff = function(){
+			LoginService.logoff().then(function(){
+				util.profile.token = null;
+				saveProfile();
+				$state.go('tab.home');
+			}, function(){});
+		};
+		
+		$ionicModal.fromTemplateUrl('templates/account/profile-nickname.html', {
 			scope: $scope,
 			animation: 'slide-in-up'
 		}).then(function(modal) {
-			$scope.modal = modal;
+			$scope.nickModal = modal;
 		});
-		$scope.openModal = function () {
-			$scope.modal.show();
+		$scope.openNickModal = function () {
+			$scope.temp.nickName = $scope.user.nickName;
+			$scope.nickModal.show();
 		};
-		$scope.closeModal = function() {
-			$scope.modal.hide();
+		$scope.closeNickModal = function() {
+			$scope.nickModal.hide();
 		};
-		$scope.saveModal = function () {
-			$scope.user.username = $scope.tempname;
-			$scope.modal.hide();
+		$scope.saveNickModal = function () {
+			$scope.user.nickName = $scope.temp.nickName;
+			$scope.nickModal.hide();
+			saveProfile();
 		};
-		$scope.$on('$destroy', function() {
-			$scope.modal.remove();
+		
+		$ionicModal.fromTemplateUrl('templates/account/profile-gender.html', {
+			scope: $scope,
+			animation: 'slide-in-up'
+		}).then(function(modal) {
+			$scope.genderModal = modal;
 		});
-		$scope.$on('modal.hide', function() {
+		$scope.openGenderModal = function () {
+			$scope.temp.gender = $scope.user.gender;
+			$scope.genderModal.show();
+		};
+		$scope.closeGenderModal = function() {
+			$scope.genderModal.hide();
+		};
+		$scope.saveGenderModal = function () {
+			$scope.user.gender = $scope.temp.gender;
+			$scope.genderModal.hide();
+			saveProfile();
+		};
+		
+		$ionicModal.fromTemplateUrl('templates/account/profile-password.html', {
+			scope: $scope,
+			animation: 'slide-in-up'
+		}).then(function(modal) {
+			$scope.passwordModal = modal;
 		});
-		$scope.$on('modal.removed', function() {
+		$scope.openPasswordModal = function(){
+			$scope.passwordModal.show();
+		};
+		$scope.closePasswordModal = function(){
+			$scope.passwordModal.hide();
+		};
+		$scope.savePasswordModal = function(){
+			$scope.passwordModal.hide();
+		};
+		
+		$ionicModal.fromTemplateUrl('templates/account/profile-lastword.html', {
+			scope: $scope,
+			animation: 'slide-in-up'
+		}).then(function(modal) {
+			$scope.signatureModal = modal;
 		});
+		$scope.openSignatureModal = function(){
+			$scope.temp.lastWord = $scope.user.lastWord;
+			$scope.signatureModal.show();
+		};
+		$scope.closeSignatureModal = function(){
+			$scope.signatureModal.hide();
+		};
+		$scope.saveSignatureModal = function(){
+			$scope.user.lastWord = $scope.temp.lastWord;
+			$scope.signatureModal.hide();
+			saveProfile();
+		};
 
 		$scope.showActionsheet = function () {
 			// Show the action sheet
 			var hideSheet = $ionicActionSheet.show({
 				buttons: [
-					{ text: 'Take Photo' },
-					{ text: 'Choose from Photos' }
+					{ text: '<i class="icon ion-camera"></i>拍照片' },
+					{ text: '<i class="icon ion-images"></i>从相册选取' }
 				],
-				cancelText: 'Cancel',
+				cancelText: '取消',
 				cancel: function () {
 					// add cancel code..
-					console.log('CANCELLED');
 				},
 				buttonClicked: function (index) {
-					console.log('BUTTON CLICKED', index);
+					if(index == 0){
+						//taking photo
+						CameraService.captureImage().then(function(mediaFiles) {
+							LocalFileService.copyProfileImg(mediaFiles[0].fullPath).then(function(url){
+								$scope.user.img = url;
+								saveProfile();
+							}, function(error){});
+							
+						}, function(err) {
+							alert(err);
+						});
+					}
+					else if(index == 1){
+						//select from album
+						CameraService.selectPicture().then(function(results) {
+						    LocalFileService.copyProfileImg(results[0]).then(function(url){
+								$scope.user.img = url;
+								saveProfile();
+							}, function(error){});
+						}, function(err) {
+							alert(err);
+						});
+					}
 					return true;
 				}
 			});
 
-			// For example's sake, hide the sheet after two seconds
-			$timeout(function () {
-				hideSheet();
-			}, 2000);
-		};
-	})
-
-	.controller('ProfileGenderCtrl', function ($scope) {
-		$scope.user = {
-			gender: 'Female'
-		};
-		$scope.genderList = [
-			{ text: "Female", value: "Female" },
-			{ text: "Male", value: "Male" }
-		];
-
-		$scope.genderUpdate = function (item) {
-			console.log("Selected Gender, text:", item.text, "value:", item.value);
-			$state.go('tab.profile');
-		};
-	})
-
-	.controller('ProfilePasswordCtrl', function ($scope) {
-		$scope.user = {
-			password: 'secret'
-		};
-		$scope.oldPassword = "";
-		$scope.newPassword = "";
-
-		$scope.submitted = false;
-
-		$scope.updatePassword = function () {
-			if ($scope.updatepassword_form.$valid) {
-				// �����ύ
-				console.log('Update-Password', user);
-				$state.go('tab.profile');
-			} else {
-				$scope.updatepassword_form.submitted = true;
-			}
-		};
-
-		$scope.genderUpdate = function () {
-			console.log('Profile', user);
-			$state.go('tab.profile');
-		};
-	})
-
-	.controller('ProfileLastWordCtrl', function ($scope) {
-		$scope.user = {
-			lastWord: 'Enjoy Your Journey!'
-		};
-
-		$scope.templastword = $scope.user.lastWord;
-
-		$scope.closeModal = function() {
-			$scope.modal.hide();
-		};
-		$scope.saveModal = function () {
-			$scope.user.lastWord = $scope.templastword;
-			$scope.modal.hide();
-		};
-
-		$scope.updateLastword = function () {
-			console.log('Profile-lastword', user);
-			$state.go('tab.profile');
 		};
 	})
 .controller('MyArticlesCtrl', function($scope, $ionicModal,LocalFileService,$ionicPopup){
@@ -711,54 +727,7 @@ angular.module('starter.controllers', [])
 	$scope.editParagraph = function(articleUuid, paragraphUuid){
 		$state.go('editor', {id: articleUuid + "," + paragraphUuid});
 	};
-	/*
-	$scope.chat = {
-			title: "【小青岛】2015第一场说走就走的旅行",
-			description: "ihuhu酱总体上要靠谱恩",
-			coverImg: "img/banners/4.jpg",
-			uuid: "12345678900000",
-			paragraphs:[
-			            {
-			            	uuid: "0549c83b33a1440c8785e295dccee2c0",
-			            	index: 1,
-			            	title: "一些碎碎念",
-			            	text:"我一直认为，女生一定要多旅行、多拍照片，很庆幸爱上摄影，这几年也去了不少地方，拍了很多风景，也给自己留下许多照片，每个时期都有不同的样子，我们不能让时间静止，但抓不住的留下瞬间也是好的！所以我每次旅行自己都会拍很多照片，记录那个时候我的样子！相信多年之后再回过头看自己拍过的照片、写过的游记，一定会感谢当时的自己！",
-			            	timestamp: "2015-06-19 8:00:00",
-			            	images:[
-			            	        {
-			            	        	url: "http://file29.mafengwo.net/M00/30/40/wKgBpVVkJYaAZe2CABTkFKvtNtg03.groupinfo.w680.jpeg",
-			            	        	title: ""
-			            	        }
-			            	        ],
-			            	vedio: null,
-			            	audio: null
-			            },
-			            {
-			            	uuid: "0549c83b33a1440c8785e295dccee2c1",
-			            	index: 2,
-			            	title: "三大教堂、劈柴院、天幕城",
-			            	text: "",
-			            	timestamp: "2015-06-19 9:00:00",
-			            	images:[
-			            	        {
-			            	        	url: "http://file29.mafengwo.net/M00/2D/6A/wKgBpVVkItSAWRWpAAjeYbm0x8E36.groupinfo.w680.jpeg",
-			            	        	title: "青岛天主教堂 "
-			            	        },
-			            	        {
-			            	        	url: "http://file29.mafengwo.net/M00/2D/72/wKgBpVVkItmAGhAnAAstvs2yW8M11.groupinfo.w680.jpeg",
-			            	        	title: "江苏路基督教堂 "
-			            	        },
-			            	        {
-			            	        	url: "http://file29.mafengwo.net/M00/4F/E6/wKgBpVVnTneALNc3AAneKqgTp1w63.groupinfo.w680.jpeg",
-			            	        	title: "劈柴院 "
-			            	        }
-			            	        ],
-			            	vedio: null,
-			            	audio: null
-			            }
-			           ]
-	};
-	*/
+	
 	$ionicModal.fromTemplateUrl('templates/share-modal.html', {
       scope: $scope,
       animation: 'slide-in-up'
@@ -767,10 +736,15 @@ angular.module('starter.controllers', [])
     });
 	
 	$scope.upload = function(article){
-		console.log(article);
-		ArticleService.uploadArticle(article).then(function(data){
-			console.log(data);
-		});
+		var loggedIn = util.isLoggedIn();
+		if(!loggedIn){
+			$state.go("signin");
+		}
+		else{
+			ArticleService.uploadArticle(article).then(function(data){
+				console.log(data);
+			});
+		}
 	};
 	
 	$scope.preview = function(article){
@@ -794,12 +768,13 @@ angular.module('starter.controllers', [])
 	};
 })
 
-.controller('AccountCtrl', function($scope) {
-  $scope.userName = util.profile.userName;
-  if(util.profile.token && util.profile.token != ""){
-	  $scope.loggedIn = true;
-  }
-  else{
-	  $scope.loggedIn = false;
-  }
+.controller('AccountCtrl', function($scope, LocalFileService) {
+    $scope.profile = util.profile;
+	if(util.profile.token && util.profile.token != ""){
+		$scope.loggedIn = true;
+	}
+	else{
+		$scope.loggedIn = false;
+	}
+  
 });

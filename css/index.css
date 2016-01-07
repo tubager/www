@@ -153,18 +153,6 @@ nav li a{
     background-position: 5%;
 }
 
-.favorite {
-    background-image: url("../img/users/user_menu_favorite@2x.png");
-}
-
-.bankcard {
-    background-image: url("../img/users/user_menu_bankcard@2x.png");
-}
-
-.setting {
-    background-image: url("../img/users/user_menu_setting@2x.png");
-}
-
-.update {
-    background-image: url("../img/users/user_menu_update@2x.png");
+.profileImg{
+	
 }

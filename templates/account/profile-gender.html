@@ -1,0 +1,16 @@
+﻿<ion-modal-view view-title="更改性别">
+    <ion-header-bar>
+        <button class="button button-clear btn-warning" ng-click="closeGenderModal()">取消</button>
+        <button class="button button-clear button-positive" ng-click="saveGenderModal()">确定</button>
+    </ion-header-bar>
+	<ion-content style="margin: 10px;">
+		<div class="list">
+            <ion-radio ng-value="'M'" ng-model="temp.gender">
+                王子
+            </ion-radio>
+			<ion-radio ng-value="'F'" ng-model="temp.gender">
+                公主
+            </ion-radio>
+        </div>
+	</ion-content>
+</ion-modal-view>

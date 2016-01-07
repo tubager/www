@@ -1,4 +1,4 @@
-﻿<ion-view view-title="Account-Profile">
+﻿<ion-view view-title="个人信息">
     <ion-nav-buttons side="left">
         <button class="button back-button button-icon ion-arrow-left-c header-item" ng-click="$ionicGoBack()">
         </button>
@@ -12,39 +12,43 @@
     <ion-content>
         <ion-list>
             <ion-item class="item-remove-animate item-avatar-right" type="item-text-wrap" ng-click="showActionsheet()">
-                <img src="img/img_5236.jpg">
-                <h2>{{user.username}}</h2>
+                <img class="profileImg" src="{{user.img}}">
+                <h2>{{user.userName}}</h2>
             </ion-item>
 
-            <ion-item class="item-icon-right" ng-click="openModal()">
-                NickName
+            <ion-item class="item-icon-right" ng-click="openNickModal()">
+                昵称
                 <span class="item-note">
-                    {{user.nickname}}
+                    {{user.nickName}}
                 </span>
                 <i class="icon ion-chevron-right icon-accessory"></i>
             </ion-item>
 
-            <ion-item class="item-icon-right" href="#/profile-password">
-                Password
+            <ion-item class="item-icon-right" ng-click="openPasswordModal()">
+                更改密码
                 <i class="icon ion-chevron-right icon-accessory"></i>
             </ion-item>
 
             <ion-item class="item item-divider">
             </ion-item>
 
-            <ion-item class="item-icon-right" href="#/profile-gender">
-                Gender
+            <ion-item class="item-icon-right" ng-click="openGenderModal()">
+                性别
                 <span class="item-note">
-                    {{user.gender}}
+                    {{user.gender=="M"?"王子":"公主"}}
                 </span>
                 <i class="icon ion-chevron-right icon-accessory"></i>
             </ion-item>
 
-            <ion-item class="item-icon-right" href="#/profile-lastword">
-                What's Up
+            <ion-item class="item-icon-right" ng-click="openSignatureModal()">
+                签名
                 <span class="item-note">
                     {{user.lastWord}}
                 </span>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+			<ion-item class="item-icon-right" ng-click="logoff()">
+                退出登录
                 <i class="icon ion-chevron-right icon-accessory"></i>
             </ion-item>
         </ion-list>

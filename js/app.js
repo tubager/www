@@ -69,7 +69,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     })
 
     .state('tab.settings', {
-      url: '/accountsettings',
+	  cache: false,
+      url: '/account/settings',
       views: {
         'tab-account': {
           templateUrl: 'templates/account-settings.html',
@@ -102,6 +103,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'ReclaimPwdCtrl'
       })
       .state('tab.profile', {
+		cache: false,
         url: '/account/profile',
         views: {
           'tab-account': {
@@ -109,24 +111,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             controller: 'AcntProfileCtrl'
           }
         }
-      })
-
-      .state('profilegender', {
-        url: '/profile-gender',
-        templateUrl: 'templates/profile-gender.html',
-        controller: 'ProfileGenderCtrl'
-      })
-
-      .state('profilepassword', {
-        url: '/profile-password',
-        templateUrl: 'templates/profile-password.html',
-        controller: 'ProfilePasswordCtrl'
-      })
-
-      .state('profilelastword', {
-        url: '/profile-lastword',
-        templateUrl: 'templates/profile-lastword.html',
-        controller: 'ProfileLastWordCtrl'
       })
 	/*
     .state('tab.chat-detail', {

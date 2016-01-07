@@ -70,6 +70,9 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			});
 			return q.promise;
 		},
+		logoff: function(){
+			
+		},
 		signUp: function(name, pw){
 			var q = $q.defer();
 			var server = util.server + "auth/signup";
@@ -102,15 +105,17 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 				$cordovaImagePicker.getPictures(options).then(function(results) {
 					var fileURL = results[0];
 					var options = new FileUploadOptions();
+					var token = util.profile.token;
 					options.fileKey = "file";
 					options.fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
 					options.mimeType = "image/jpeg";
 					options.httpMethod = "POST";
 					options.params = {"name": options.fileName};
-					options.headers={'X-Auth-Token':'abcde'};
+					options.headers={'X-Auth-Token': token};
 					
+					var url = util.server + "upload";
 					var ft = new FileTransfer();
-					ft.upload(fileURL, encodeURI("http://120.25.68.228:8080/upload"), function(r){
+					ft.upload(fileURL, encodeURI(url), function(r){
 						q.resolve(r);
 					}, function(error){
 						q.reject(error);
@@ -124,7 +129,11 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		},
 		testConnection: function(){
 			var server = util.server + "auth/connection";
-			$http.get(server);
+			$http.get(server).then(function(success){
+				//alert("连接成功");
+			}, function(error){
+				alert(JSON.stringify(error));
+			});
 		}
 	}
 }])
@@ -163,12 +172,44 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			if(!profile){
 				profile = {};
 			}
-			$cordovaFile.writeExistingFile(cordova.file.dataDirectory, "profile.json", JSON.stringify(profile))
+			$cordovaFile.writeFile(cordova.file.dataDirectory, "profile.json", JSON.stringify(profile), true)
 			.then(function (success) {
 				q.resolve(success);
 			}, function (error) {
 				q.reject(error);
 			});
+			return q.promise;
+		},
+		
+		removeProfileImg: function(newName){
+			var q = $q.defer();
+			$cordovaFile.removeFile(cordova.file.dataDirectory, newName)
+			.then(function (success) {
+				// success
+				q.resolve();
+			}, function (error) {
+				alert(JSON.stringify(error));
+				q.resolve();
+			});
+			return q.promise;
+		},
+		
+		copyProfileImg: function(url){
+			var q = $q.defer();
+			var oldDir = url.substr(0,url.lastIndexOf("/")+1);
+			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
+			var newName = "UserImage." + fileName.split(".")[1];
+			this.removeProfileImg(newName).then(function(){
+				$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory, newName)
+				.then(function (success) {
+					// success
+					q.resolve(cordova.file.dataDirectory + newName);
+				}, function (error) {
+				alert(JSON.stringify(error));
+					q.reject(error);
+				});
+			}, function(){});
+			
 			return q.promise;
 		},
 		
@@ -219,7 +260,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 		
 		saveArticleList: function(articleList){
 			var q = $q.defer();
-			$cordovaFile.writeExistingFile(cordova.file.dataDirectory, "my_article.json", JSON.stringify(articleList))
+			$cordovaFile.writeFile(cordova.file.dataDirectory, "my_article.json", JSON.stringify(articleList),true)
 			.then(function (success) {
 				q.resolve(success);
 			}, function (error) {
@@ -336,14 +377,18 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 //					    'X-Auth-Token': "abcde"
 //					}
 //			};
-			return $http.get('http://120.25.68.228:8080/books',{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"},data:{}}).then(function(items){
+			var url = util.server + "books";
+			var token = util.profile.token;
+			return $http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token},data:{}}).then(function(items){
 				articles = items.data;
 				return articles;
 			});
 		},
 		
 		uploadArticle: function(article){
-			return $http.post('http://localhost:8080/book',article,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': "abcde"}}).then(function(d){
+			var url = util.server + "book";
+			var token = util.profile.token;
+			return $http.post(url,article,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(d){
 				return d;
 			});
 		}
