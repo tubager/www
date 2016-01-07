@@ -71,7 +71,32 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			return q.promise;
 		},
 		logoff: function(){
-			
+			var q = $q.defer();
+			var url = util.server + "auth/logoff";
+			var token = util.profile.token;
+			$http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(success){
+				q.resolve(success);
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		changePassword: function(oldPassword, newPassword){
+			var q = $q.defer();
+			var url = util.server + "auth/password";
+			var token = util.profile.token;
+			var data = {
+				"userName": oldPassword,
+				"password": newPassword,
+				"code": ""
+			};
+			$http.post(url, data, {headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(response){
+				var token = response.data.token;
+				q.resolve(response.data);
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
 		},
 		signUp: function(name, pw){
 			var q = $q.defer();

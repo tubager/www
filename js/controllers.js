@@ -33,7 +33,7 @@ angular.module('starter.controllers', [])
 		LocalFileService.getProfile().then(function(profile){
 			util.profile = profile;
 		}, function(error){
-			alert(JSON.stringify(error));
+			//alert(JSON.stringify(error));
 		});
     }
 })
@@ -135,16 +135,16 @@ angular.module('starter.controllers', [])
 			util.profile.img = $scope.user.img;
 			util.profile.gender = $scope.user.gender;
 			util.profile.lastWord = $scope.user.lastWord;
-			alert(JSON.stringify(util.profile));
 			LocalFileService.saveProfile(util.profile);
 		}
 		
 		$scope.logoff = function(){
 			LoginService.logoff().then(function(){
-				util.profile.token = null;
-				saveProfile();
-				$state.go('tab.home');
+				
 			}, function(){});
+			util.profile.token = null;
+			saveProfile();
+			$state.go('tab.account');
 		};
 		
 		$ionicModal.fromTemplateUrl('templates/account/profile-nickname.html', {
@@ -192,13 +192,40 @@ angular.module('starter.controllers', [])
 			$scope.passwordModal = modal;
 		});
 		$scope.openPasswordModal = function(){
+			$scope.temp.oldPassword = "";
+			$scope.temp.newPassword1 = "";
+			$scope.temp.newPassword2 = "";
 			$scope.passwordModal.show();
 		};
 		$scope.closePasswordModal = function(){
 			$scope.passwordModal.hide();
 		};
 		$scope.savePasswordModal = function(){
-			$scope.passwordModal.hide();
+			if($scope.temp.newPassword1 != $scope.temp.newPassword2){
+				var alertPopup = $ionicPopup.alert({
+					title: '更改密码失败!',
+					template: '两次输入的密码不一致!'
+				});
+			}
+			else{
+				LoginService.changePassword($scope.temp.oldPassword, $scope.temp.newPassword1).then(function(response){
+					console.log(response);
+					var token = response.token;
+					util.profile.token = token;
+					LocalFileService.saveProfile(util.profile).then(function(success){
+						$state.go('tab.account');
+					}, function(e){
+						alert(JSON.stringify(e));
+					});
+				},function(error){
+					$ionicPopup.alert({
+						title: '更改密码失败!',
+						template: error.data.message
+					});
+				});
+				$scope.passwordModal.hide();
+			}
+			
 		};
 		
 		$ionicModal.fromTemplateUrl('templates/account/profile-lastword.html', {
@@ -770,6 +797,7 @@ angular.module('starter.controllers', [])
 
 .controller('AccountCtrl', function($scope, LocalFileService) {
     $scope.profile = util.profile;
+	$scope.img = util.profile.img || "img/users/t1.jpg";
 	if(util.profile.token && util.profile.token != ""){
 		$scope.loggedIn = true;
 	}

@@ -102,15 +102,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         templateUrl: 'templates/reclaim-password.html',
         controller: 'ReclaimPwdCtrl'
       })
-      .state('tab.profile', {
+      .state('profile', {
 		cache: false,
         url: '/account/profile',
-        views: {
-          'tab-account': {
-            templateUrl: 'templates/account-profile.html',
-            controller: 'AcntProfileCtrl'
-          }
-        }
+		templateUrl: 'templates/account-profile.html',
+        controller: 'AcntProfileCtrl'
       })
 	/*
     .state('tab.chat-detail', {

@@ -79,6 +79,7 @@ nav li a{
     margin: auto;
     border: 5px solid #9F9887;
     border-radius: 100%;
+	overflow: hidden;
 }
 
 .user-img img {
