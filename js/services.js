@@ -152,6 +152,30 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 				
 				return q.promise;
 		},
+		uploadProfile: function(){
+			var q = $q.defer();
+			var server = util.server + "user";
+			var token = util.profile.token;
+			var fileName = util.profile.img.substr(url.lastIndexOf("/")+1, url.length-1);
+			var data = {
+				userName: util.profile.userName || "",
+				nickName: util.profile.nickName || "",
+				email: util.profile.email || "",
+				mobile: util.profile.mobile || "",
+				gender: util.profile.gender || "M",
+				address: util.profile.address || "",
+				lastWord: util.profile.lastWord || "",
+				img: fileName
+			};
+			$http.post(server, data, {headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(response){
+				var token = response.data.token;
+				q.resolve(response.data);
+			}, function(error){
+				console.log(error);
+				q.reject(error);
+			});
+			return q.promise;
+		},
 		testConnection: function(){
 			var server = util.server + "auth/connection";
 			$http.get(server).then(function(success){
@@ -223,7 +247,7 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			var q = $q.defer();
 			var oldDir = url.substr(0,url.lastIndexOf("/")+1);
 			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
-			var newName = "UserImage." + fileName.split(".")[1];
+			var newName = util.getUuid() + "." + fileName.split(".")[1];
 			this.removeProfileImg(newName).then(function(){
 				$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory, newName)
 				.then(function (success) {

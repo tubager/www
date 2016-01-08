@@ -118,7 +118,7 @@ angular.module('starter.controllers', [])
 	})
 
 
-	.controller('AcntProfileCtrl', function ($scope, $ionicActionSheet, $ionicModal, CameraService, LocalFileService, LoginService, $state) {
+	.controller('AcntProfileCtrl', function ($scope, $ionicActionSheet, $ionicModal, CameraService, LocalFileService, LoginService, $state,FileService) {
 		$scope.user = {
 			userName: util.profile.userName || "",
 			nickName: util.profile.nickName || "",
@@ -140,6 +140,14 @@ angular.module('starter.controllers', [])
 			util.profile.email = $scope.user.email;
 			LocalFileService.saveProfile(util.profile);
 		}
+		
+		$scope.save = function(){
+			FileService.uploadProfile().then(function(success){
+				$state.go("tab.account");
+			}, function(error){
+				
+			});
+		};
 		
 		$scope.logoff = function(){
 			LoginService.logoff().then(function(){
