@@ -123,6 +123,7 @@ angular.module('starter.controllers', [])
 			userName: util.profile.userName || "",
 			nickName: util.profile.nickName || "",
 			email: util.profile.email || "",
+			mobile: util.profile.mobile || "",
 			gender: util.profile.gender || "M",
 			address: util.profile.address || "",
 			lastWord: util.profile.lastWord || "",
@@ -135,6 +136,8 @@ angular.module('starter.controllers', [])
 			util.profile.img = $scope.user.img;
 			util.profile.gender = $scope.user.gender;
 			util.profile.lastWord = $scope.user.lastWord;
+			util.profile.mobile = $scope.user.mobile;
+			util.profile.email = $scope.user.email;
 			LocalFileService.saveProfile(util.profile);
 		}
 		
@@ -163,6 +166,44 @@ angular.module('starter.controllers', [])
 		$scope.saveNickModal = function () {
 			$scope.user.nickName = $scope.temp.nickName;
 			$scope.nickModal.hide();
+			saveProfile();
+		};
+		
+		$ionicModal.fromTemplateUrl('templates/account/profile-mobile.html', {
+			scope: $scope,
+			animation: 'slide-in-up'
+		}).then(function(modal) {
+			$scope.mobileModal = modal;
+		});
+		$scope.openMobileModal = function () {
+			$scope.temp.mobile = $scope.user.mobile;
+			$scope.mobileModal.show();
+		};
+		$scope.closeMobileModal = function() {
+			$scope.mobileModal.hide();
+		};
+		$scope.saveMobileModal = function () {
+			$scope.user.mobile = $scope.temp.mobile;
+			$scope.mobileModal.hide();
+			saveProfile();
+		};
+		
+		$ionicModal.fromTemplateUrl('templates/account/profile-email.html', {
+			scope: $scope,
+			animation: 'slide-in-up'
+		}).then(function(modal) {
+			$scope.emailModal = modal;
+		});
+		$scope.openEmailModal = function () {
+			$scope.temp.email = $scope.user.email;
+			$scope.emailModal.show();
+		};
+		$scope.closeEmailModal = function() {
+			$scope.emailModal.hide();
+		};
+		$scope.saveEmailModal = function () {
+			$scope.user.email = $scope.temp.email;
+			$scope.emailModal.hide();
 			saveProfile();
 		};
 		

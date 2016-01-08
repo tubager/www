@@ -1,0 +1,9 @@
+﻿<ion-modal-view view-title="更改邮箱">
+    <ion-header-bar>
+        <button class="button button-clear btn-warning" ng-click="closeEmailModal()">取消</button>
+        <button class="button button-clear button-calm" ng-click="saveEmailModal()">确定</button>
+    </ion-header-bar>
+	<ion-content style="margin: 10px;">
+		<input ng-model="temp.email" type="text" placeholder="email" value="{{user.email}}"/>
+	</ion-content>
+</ion-modal-view>

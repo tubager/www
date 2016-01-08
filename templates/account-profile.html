@@ -32,6 +32,25 @@
             <ion-item class="item item-divider">
             </ion-item>
 
+            <ion-item class="item-icon-right" ng-click="openMobileModal()">
+                手机
+                <span class="item-note">
+                    {{user.mobile}}
+                </span>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item-icon-right" ng-click="openEmailModal()">
+                邮箱
+                <span class="item-note">
+                    {{user.email}}
+                </span>
+                <i class="icon ion-chevron-right icon-accessory"></i>
+            </ion-item>
+
+            <ion-item class="item item-divider">
+            </ion-item>
+
             <ion-item class="item-icon-right" ng-click="openGenderModal()">
                 性别
                 <span class="item-note">

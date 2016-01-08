@@ -1,0 +1,9 @@
+﻿<ion-modal-view view-title="更改手机">
+    <ion-header-bar>
+        <button class="button button-clear btn-warning" ng-click="closeMobileModal()">取消</button>
+        <button class="button button-clear button-calm" ng-click="saveMobileModal()">确定</button>
+    </ion-header-bar>
+	<ion-content style="margin: 10px;">
+		<input ng-model="temp.mobile" type="text" placeholder="手机号码" value="{{user.mobile}}"/>
+	</ion-content>
+</ion-modal-view>
