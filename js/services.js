@@ -358,6 +358,16 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			return q.promise;
 		},
 		
+		removeArticle: function(uuid){
+			var q = $q.defer();
+			$cordovaFile.removeRecursively(cordova.file.dataDirectory, uuid).then(function(success){
+				q.resolve(uuid);
+			}, function(error){
+				q.resolve(uuid);
+			});
+			return q.promise;
+		},
+		
 		checkDir: function(dir){
 			var q = $q.defer();
 			$cordovaFile.checkDir(cordova.file.dataDirectory, dir)

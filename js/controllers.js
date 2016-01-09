@@ -360,12 +360,41 @@ angular.module('starter.controllers', [])
 	LocalFileService.listArticles().then(function(data){
 		articleList = data.articles;
 		$scope.articles = articleList;
+		$scope.currentArticle = data.currentArticle;
 		if(!$scope.$$phase) {
 			$scope.$apply();
 		}
 	}, function(err){
 		alert(JSON.stringify(err));
 	});
+	
+	$ionicModal.fromTemplateUrl('templates/newarticle-modal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.titleModel = modal;
+    });
+	
+	$scope.editArticle = function(a){
+		$scope.data = {articleTitle: a.title, articleDesc: a.description, id: a.id};
+		$scope.titleModel.show();
+	};
+	
+	$scope.confirmNewArticle = function(){
+		for(var i=0; i<$scope.articles.length; i++){
+			var a = $scope.articles[i];
+			if(a.id == $scope.data.id){
+				a.title = $scope.data.articleTitle;
+				a.description = $scope.data.articleDesc;
+				break;
+			}
+		}
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+		LocalFileService.saveArticleList({articles: $scope.articles, currentArticle: $scope.currentArticle});
+		$scope.titleModel.hide();
+	};
 	
 	$scope.removeArticle = function(uuid){
 		$ionicPopup.confirm({

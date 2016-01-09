@@ -8,18 +8,30 @@
 	</ion-nav-buttons>
 	<ion-content class="padding">
       <ion-list>
-          <ion-item class="article-list" ng-repeat="a in articles" type="item-text-wrap" href="#/timeline/{{a.id}}">
+          <ion-item class="article-list" ng-repeat="a in articles" type="item-text-wrap">
 			  <div class="">
                   <div class="article-tile">
-                      <img class="full-image" src="img/travel-default.png">
-                      <div class="tile-text">
-	                      <div class="tile-title">
-	                          {{a.title}}
-	                      </div>
-	                      <div class="tile-sub-title">
-	                      	{{a.description}}
-	                      </div>
-                      </div>
+					<div style="position: absolute; top: 0px; right: 0px;">
+		   				<span>
+		   					<button class="button button-icon ion-android-create" style="margin-bottom: 15px" ng-click="editArticle(a)">
+        					</button>
+		   					<button class="button button-icon ion-android-remove-circle" ng-click="removeArticle(a.id)">
+        					</button>
+		   				</span>
+					</div>
+					<a href="#/timeline/{{a.id}}">
+						<div>
+						  <img class="full-image" src="img/travel-default.png">
+						  <div class="tile-text">
+							  <div class="tile-title">
+								  {{a.title}}
+							  </div>
+							  <div class="tile-sub-title">
+								{{a.description}}
+							  </div>
+						  </div>
+					  </div>
+					</a>
                   </div>
               </div>
           </ion-item>
