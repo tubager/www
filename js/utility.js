@@ -12,6 +12,16 @@ var util = {
 		img: "img/img_5236.jpg",
 		token: null
 	},
+	defaultProfile: {
+		userName: "",
+		nickName: "",
+		email: "",
+		gender: "M",
+		address: "",
+		lastWord: "",
+		img: "img/img_5236.jpg",
+		token: null
+	},
 	isLoggedIn: function(){
 		if(!util.profile.token){
 			return false;

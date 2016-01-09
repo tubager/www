@@ -20,17 +20,34 @@
 		</div>
 	</a>
     <div class="content">
-      <nav style="margin-top:10px; background-color:white;">
-        <ul>
-          <li><a href=""><span class="icon ion-ios-glasses-outline setting-li"></span><span style="display: inline-block;">关注</span></a></li>
-		  <li class="li-divider"></li>
-          <li><a href="#/tab/account/profile"><span class="icon ion-ios-download-outline setting-li"></span><span style="display: inline-block;">下载</span></a></li>
-		  <li class="li-divider"></li>
-          <li><a href="#/tab/account/settings"><span class="icon ion-ios-gear-outline setting-li"></span><span style="display: inline-block;">设置</span></a></li>
-		  <li class="li-divider"></li>
-          <li><a href=""><span class="icon ion-ios-loop setting-li"></span><span style="display: inline-block;">版本更新</span></a></li>
-        </ul>
-      </nav>
+		<ion-list>
+			<ion-item class="item item-divider">
+            </ion-item>
+			<ion-item class="item-icon-left" style={{loggedIn?"display:block;":"display:none;"}} ng-click="bookManagement()">
+                游记管理
+                <i class="icon ion-ios-folder-outline" style="font-size:1.5em;color:#15D4B5;"></i>
+            </ion-item>
+			<ion-item class="item-icon-left" style={{loggedIn?"display:block;":"display:none;"}} ng-click="defaultManagement()">
+                设置默认游记
+                <i class="icon ion-ios-book-outline" style="font-size:1.5em;color:#15D4B5;"></i>
+            </ion-item>
+			<ion-item class="item item-divider" style={{loggedIn?"display:block;":"display:none;"}}>
+            </ion-item>
+			<ion-item class="item-icon-left" ng-click="downloadManagement()">
+                下载管理
+                <i class="icon ion-ios-cloud-download-outline" style="font-size:1.5em;color:#15D4B5;"></i>
+            </ion-item>
+			<ion-item class="item-icon-left" ng-click="cacheClearing()">
+                清除缓存
+                <i class="icon ion-ios-trash-outline" style="font-size:1.5em;color:#15D4B5;"></i>
+            </ion-item>
+			<ion-item class="item item-divider">
+            </ion-item>
+			<ion-item class="item-icon-left" ng-click="about()">
+                关于途八哥
+                <i class="icon ion-ios-information-outline" style="font-size:1.5em;color:#15D4B5;"></i>
+            </ion-item>
+		</ion-list>
     </div>
   </ion-content>
 </ion-view>

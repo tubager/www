@@ -41,7 +41,7 @@ angular.module('starter.controllers', [])
 	.controller('AcntSettingsCtrl', function ($scope) {
 	})
 
-	.controller('SignInCtrl', function ($scope, LoginService, $ionicPopup, $state,LocalFileService) {
+	.controller('SignInCtrl', function ($scope, LoginService, $ionicPopup, $state,LocalFileService, FileService) {
 		$scope.user = {};
 		$scope.submitted = false;
 
@@ -51,11 +51,17 @@ angular.module('starter.controllers', [])
 					var token = response.token;
 					util.profile.token = token;
 					util.profile.userName = $scope.user.username;
-					LocalFileService.saveProfile(util.profile).then(function(success){
-						$state.go('tab.account');
-					}, function(e){
-						alert(JSON.stringify(e));
-					});
+					FileService.downloadProfile().then(function(user){
+						util.profile.mobile = user.mobile;
+						util.profile.email = user.email;
+						util.profile.gender = user.gender || "M";
+						util.profile.lastWord = user.lastWord;
+						LocalFileService.saveProfile(util.profile).then(function(success){
+							$state.go('tab.account');
+						}, function(e){
+							alert(JSON.stringify(e));
+						});
+					},function(){});
 				},function(error){
 					$ionicPopup.alert({
 						title: '登录失败!',
@@ -82,6 +88,7 @@ angular.module('starter.controllers', [])
 					LoginService.signUp(user.username, user.password1).then(function(response){
 						console.log(response);
 						var token = response.token;
+						util.profile = util.defaultProfile;
 						util.profile.token = token;
 						util.profile.userName = $scope.user.username;
 						LocalFileService.saveProfile(util.profile).then(function(success){
@@ -145,7 +152,13 @@ angular.module('starter.controllers', [])
 			FileService.uploadProfile().then(function(success){
 				$state.go("tab.account");
 			}, function(error){
+				alert(JSON.stringify(error));
+			});
+			
+			FileService.uploadProfileImg().then(function(success){
 				
+			}, function(error){
+				alert(JSON.stringify(error));
 			});
 		};
 		
@@ -153,6 +166,7 @@ angular.module('starter.controllers', [])
 			LoginService.logoff().then(function(){
 				
 			}, function(){});
+			//util.profile = util.defaultProfile;
 			util.profile.token = null;
 			saveProfile();
 			$state.go('tab.account');
@@ -844,7 +858,7 @@ angular.module('starter.controllers', [])
 	};
 })
 
-.controller('AccountCtrl', function($scope, LocalFileService) {
+.controller('AccountCtrl', function($scope, LocalFileService, $state, $ionicModal,$ionicPopup) {
     $scope.profile = util.profile;
 	$scope.img = util.profile.img || "img/users/t1.jpg";
 	if(util.profile.token && util.profile.token != ""){
@@ -853,5 +867,55 @@ angular.module('starter.controllers', [])
 	else{
 		$scope.loggedIn = false;
 	}
+	
+	$scope.temp = {currentArticle: ""};
+	$scope.articles = [];
+	
+	LocalFileService.listArticles().then(function(data){
+		$scope.articles = data.articles;
+		$scope.temp.currentArticle = data.currentArticle;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	}, function(err){
+		alert(JSON.stringify(err));
+	});
+	
+	$ionicModal.fromTemplateUrl('templates/defaultarticle-modal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.defaultModal = modal;
+    });
+	
+	$scope.closeDefaultModal = function(){
+		$scope.defaultModal.hide();
+	};
+	
+	$scope.saveDefaultModal = function(){
+		LocalFileService.saveArticleList({'articles':$scope.articles, 'currentArticle': $scope.temp.currentArticle}).then(function(){
+			
+		}, function(){});
+		$scope.defaultModal.hide();
+	};
+	
+	$scope.bookManagement = function(){
+		$state.go("myarticles");
+	};
+	$scope.defaultManagement = function(){
+		$scope.defaultModal.show();
+	};
+	$scope.downloadManagement = function(){
+		
+	};
+	$scope.cacheClearing = function(){
+		$ionicPopup.alert({
+			title: '',
+			template: '缓存清理完毕!'
+		});
+	};
+	$scope.about = function(){
+		
+	};
   
 });

@@ -120,14 +120,14 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 .service('FileService', ['$q','$cordovaFileTransfer', '$cordovaImagePicker', '$http', function($q, $cordovaFileTransfer,$cordovaImagePicker, $http){
 	return {
 		uploadImage: function(){
-			var options = {
+			var opt = {
 					   maximumImagesCount: 1,
 					   width: 0,
 					   height: 0,
 					   quality: 80
 				};
 				var q = $q.defer();
-				$cordovaImagePicker.getPictures(options).then(function(results) {
+				$cordovaImagePicker.getPictures(opt).then(function(results) {
 					var fileURL = results[0];
 					var options = new FileUploadOptions();
 					var token = util.profile.token;
@@ -152,13 +152,43 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 				
 				return q.promise;
 		},
+		uploadProfileImg: function(){
+			var q = $q.defer();
+			var fileURL = util.profile.img;
+			var options = new FileUploadOptions();
+					var token = util.profile.token;
+					options.fileKey = "file";
+					options.fileName = fileURL.substr(fileURL.lastIndexOf('/') + 1);
+					options.mimeType = "image/jpeg";
+					options.httpMethod = "POST";
+					options.headers={'X-Auth-Token': token};
+			var url = util.server + "uploadprofileimg";
+			var ft = new FileTransfer();
+			ft.upload(fileURL, encodeURI(url), function(r){
+				q.resolve(r);
+			}, function(error){
+				q.reject(error);
+			}, options);
+			return q.promise;
+		},
+		downloadProfile: function(){
+			var q = $q.defer();
+			var server = util.server + "user";
+			var token = util.profile.token;
+			$http.get(server, {headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(user){
+				q.resolve(user.data);
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
+		},
 		uploadProfile: function(){
 			var q = $q.defer();
 			var server = util.server + "user";
 			var token = util.profile.token;
-			var fileName = util.profile.img.substr(url.lastIndexOf("/")+1, url.length-1);
+			var fileName = util.profile.img.substr(util.profile.img.lastIndexOf("/")+1);
 			var data = {
-				userName: util.profile.userName || "",
+				name: util.profile.userName || "",
 				nickName: util.profile.nickName || "",
 				email: util.profile.email || "",
 				mobile: util.profile.mobile || "",
@@ -168,10 +198,8 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 				img: fileName
 			};
 			$http.post(server, data, {headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(response){
-				var token = response.data.token;
-				q.resolve(response.data);
+				q.resolve({});
 			}, function(error){
-				console.log(error);
 				q.reject(error);
 			});
 			return q.promise;
