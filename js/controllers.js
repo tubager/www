@@ -351,9 +351,9 @@ angular.module('starter.controllers', [])
 
 		};
 	})
-.controller('MyArticlesCtrl', function($scope, $ionicModal,LocalFileService,$ionicPopup){
+.controller('MyArticlesCtrl', function($scope, $ionicModal,LocalFileService,$ionicPopup,$ionicActionSheet,CameraService){
 	var articleList = [];
-	//$scope.articles = [{title: "AAAAAAA", id: "1111"}, {title: "BBBBBB", id: "222222"}];
+	//$scope.articles = [{title: "AAAAAAA", id: "1111", coverImg:"img/travel-default.png"}, {title: "BBBBBB", id: "222222", coverImg: "img/travel-default.png"}];
 	//return;
 	$scope.articles = [];
 	
@@ -376,23 +376,66 @@ angular.module('starter.controllers', [])
     });
 	
 	$scope.editArticle = function(a){
-		$scope.data = {articleTitle: a.title, articleDesc: a.description, id: a.id};
+		$scope.data = {articleTitle: a.title, articleDesc: a.description, id: a.id, coverImg: a.coverImg || "img/travel-default.png"};
 		$scope.titleModel.show();
 	};
 	
-	$scope.confirmNewArticle = function(){
-		for(var i=0; i<$scope.articles.length; i++){
-			var a = $scope.articles[i];
-			if(a.id == $scope.data.id){
-				a.title = $scope.data.articleTitle;
-				a.description = $scope.data.articleDesc;
-				break;
+	$scope.changeCoverImg = function(){
+		$ionicActionSheet.show({
+			buttons: [
+				{ text: '<i class="icon ion-camera"></i>拍照片' },
+				{ text: '<i class="icon ion-images"></i>从相册选取' }
+			],
+			cancelText: '取消',
+			cancel: function () {
+				// add cancel code..
+			},
+			buttonClicked: function (index) {
+				if(index == 0){
+					//taking photo
+					CameraService.captureImage().then(function(mediaFiles) {
+						$scope.data.coverImg = mediaFiles[0].fullPath;
+					}, function(err) {
+						alert(err);
+					});
+				}
+				else if(index == 1){
+					//select from album
+					CameraService.selectPicture().then(function(results) {
+						$scope.data.coverImg = results[0];
+					}, function(err) {
+						alert(err);
+					});
+				}
+				return true;
 			}
-		}
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-		LocalFileService.saveArticleList({articles: $scope.articles, currentArticle: $scope.currentArticle});
+		});
+	};
+	
+	$scope.closeNewArticle = function(){
+		$scope.titleModel.hide();
+	};
+	
+	$scope.confirmNewArticle = function(){
+		LocalFileService.copyCoverImg($scope.data.coverImg, $scope.data.id).then(function(url){
+			for(var i=0; i<$scope.articles.length; i++){
+				var a = $scope.articles[i];
+				if(a.id == $scope.data.id){
+					a.title = $scope.data.articleTitle;
+					a.description = $scope.data.articleDesc;
+					a.coverImg = url;
+					break;
+				}
+			}
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
+			LocalFileService.saveArticleList({articles: $scope.articles, currentArticle: $scope.currentArticle});
+			LocalFileService.updateCoverImgUrl($scope.data.id, url, $scope.data.articleTitle, $scope.data.articleDesc);
+		}, function(error){
+			alert(JSON.stringify(error));
+		});
+		
 		$scope.titleModel.hide();
 	};
 	
@@ -424,7 +467,7 @@ angular.module('starter.controllers', [])
 		
 	};
 })
-.controller('NewArticleCtrl', function($scope, $ionicModal, $state, $stateParams, $cordovaGeolocation, LocalFileService, CameraService){
+.controller('NewArticleCtrl', function($scope, $ionicModal, $state, $stateParams, $cordovaGeolocation, LocalFileService, CameraService,$ionicActionSheet){
 	var articleList = [];
 	var currentArticle = null;
 	var currentParagraph = null;
@@ -553,6 +596,7 @@ angular.module('starter.controllers', [])
 	
 	$scope.save = function(){
 		if($scope.data.article.id == "new"){
+			$scope.data.coverImg = "img/travel-default.png";
 			$scope.titleModel.show();
 		}
 		else{
@@ -564,8 +608,9 @@ angular.module('starter.controllers', [])
 		$scope.titleModel.hide();
 		var title = $scope.data.articleTitle;
 		var description = $scope.data.articleDesc;
+		var coverImg = $scope.data.coverImg;
 		var id = "A" + util.getUuid();
-		$scope.articles.splice(1,0,{'id': id, 'title': title, 'description': description});
+		$scope.articles.splice(1,0,{'id': id, 'title': title, 'description': description, 'coverImg': coverImg});
 		$scope.data.article = $scope.articles[1];
 		if(!$scope.$$phase) {
 			$scope.$apply();
@@ -574,7 +619,7 @@ angular.module('starter.controllers', [])
 		for(var i=1; i<$scope.articles.length; i++){
 			articleList.push($scope.articles[i]);
 		}
-		LocalFileService.saveArticle({'uuid': id, 'title': title, 'description': description, 'paragraphs': []}, id).then(function(success){
+		LocalFileService.saveArticle({'uuid': id, 'title': title, 'description': description, 'coverImg':coverImg, 'paragraphs': []}, id).then(function(success){
 			LocalFileService.saveArticleList({'articles':articleList, 'currentArticle': id}).then(function(success){
 				doSave();
 			}, function(err){
@@ -584,6 +629,38 @@ angular.module('starter.controllers', [])
 			alert(JSON.stringify(error));
 		});
 		
+	};
+	
+	$scope.changeCoverImg = function(){
+		$ionicActionSheet.show({
+			buttons: [
+				{ text: '<i class="icon ion-camera"></i>拍照片' },
+				{ text: '<i class="icon ion-images"></i>从相册选取' }
+			],
+			cancelText: '取消',
+			cancel: function () {
+				// add cancel code..
+			},
+			buttonClicked: function (index) {
+				if(index == 0){
+					//taking photo
+					CameraService.captureImage().then(function(mediaFiles) {
+						$scope.data.coverImg = mediaFiles[0].fullPath;
+					}, function(err) {
+						alert(err);
+					});
+				}
+				else if(index == 1){
+					//select from album
+					CameraService.selectPicture().then(function(results) {
+						$scope.data.coverImg = results[0];
+					}, function(err) {
+						alert(err);
+					});
+				}
+				return true;
+			}
+		});
 	};
 	
 	$ionicModal.fromTemplateUrl('templates/photo-modal.html', {

@@ -258,14 +258,13 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			return q.promise;
 		},
 		
-		removeProfileImg: function(newName){
+		removeProfileImg: function(newName, path){
 			var q = $q.defer();
-			$cordovaFile.removeFile(cordova.file.dataDirectory, newName)
+			$cordovaFile.removeFile(cordova.file.dataDirectory + path, newName)
 			.then(function (success) {
 				// success
 				q.resolve();
 			}, function (error) {
-				alert(JSON.stringify(error));
 				q.resolve();
 			});
 			return q.promise;
@@ -276,17 +275,33 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			var oldDir = url.substr(0,url.lastIndexOf("/")+1);
 			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
 			var newName = util.getUuid() + "." + fileName.split(".")[1];
-			this.removeProfileImg(newName).then(function(){
+			this.removeProfileImg(newName, "").then(function(){
 				$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory, newName)
 				.then(function (success) {
 					// success
 					q.resolve(cordova.file.dataDirectory + newName);
 				}, function (error) {
-				alert(JSON.stringify(error));
 					q.reject(error);
 				});
 			}, function(){});
 			
+			return q.promise;
+		},
+		
+		copyCoverImg: function(url, uuid){
+			var q = $q.defer();
+			var oldDir = url.substr(0,url.lastIndexOf("/")+1);
+			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
+			var newName = util.getUuid() + "." + fileName.split(".")[1];
+			this.removeProfileImg(newName, uuid + "/").then(function(){
+				$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory + uuid + "/", newName)
+				.then(function (success) {
+					// success
+					q.resolve(cordova.file.dataDirectory + uuid + "/" + newName);
+				}, function (error) {
+					q.reject(error);
+				});
+			}, function(){});
 			return q.promise;
 		},
 		
@@ -354,6 +369,26 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 				q.resolve(article);
 			}, function (err) {
 				q.reject(err);
+			});
+			return q.promise;
+		},
+		
+		updateCoverImgUrl: function(uuid, url, title, description){
+			var q = $q.defer();
+			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
+			this.readArticle(uuid).then(function(article){
+				article.coverImg = fileName;
+				article.title = title;
+				article.description = description;
+				$cordovaFile.writeFile(cordova.file.dataDirectory + uuid + "/", uuid + ".json", JSON.stringify(article), true)
+				.then(function (success) {
+					alert("CoverImg updated for article " + uuid);
+					q.resolve(success);
+				}, function (error) {
+					q.reject(error);
+				});
+			}, function(e){
+				q.reject(e);
 			});
 			return q.promise;
 		},

@@ -9,9 +9,9 @@
 	<ion-content class="padding">
       <ion-list>
           <ion-item class="article-list" ng-repeat="a in articles" type="item-text-wrap">
-			  <div class="">
+			  <div style="margin-top:-10px;">
                   <div class="article-tile">
-					<div style="position: absolute; top: 0px; right: 0px;">
+					<div style="float: right;height:35px;">
 		   				<span>
 		   					<button class="button button-icon ion-android-create" style="margin-bottom: 15px" ng-click="editArticle(a)">
         					</button>
@@ -19,9 +19,10 @@
         					</button>
 		   				</span>
 					</div>
+		   			<div style="clear:both;"></div>
 					<a href="#/timeline/{{a.id}}">
 						<div>
-						  <img class="full-image" src="img/travel-default.png">
+						  <img class="full-image" src="{{a.coverImg}}">
 						  <div class="tile-text">
 							  <div class="tile-title">
 								  {{a.title}}
