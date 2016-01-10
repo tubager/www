@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+﻿angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading, ArticleService,LocalFileService, FileService) {
     $scope.sliders = Sliders.all();
@@ -85,7 +85,7 @@ angular.module('starter.controllers', [])
 					});
 				}
 				else{
-					LoginService.signUp(user.username, user.password1).then(function(response){
+					LoginService.signUp(user.username, user.password1, user.mobile, user.email).then(function(response){
 						console.log(response);
 						var token = response.token;
 						util.profile = util.defaultProfile;
@@ -494,7 +494,7 @@ angular.module('starter.controllers', [])
 	});
 	$scope.images = [];
 	$scope.sounds = [];
-	$scope.data = {"text": "", "location": {"name": "", "latitude": "", "longitude": ""}};
+	$scope.data = {"text": "", "title": "", "location": {"name": "", "latitude": "", "longitude": ""}};
 	
 	if($stateParams.id != "new"){
 		var articleUuid = $stateParams.id.split(",")[0];
@@ -509,6 +509,7 @@ angular.module('starter.controllers', [])
 				}
 			});
 			if(p != null){
+				$scope.data.title = p.title || "";
 				$scope.images = p.images;
 				$scope.sounds = p.sounds;
 				$scope.data.text = p.text;
@@ -553,6 +554,7 @@ angular.module('starter.controllers', [])
 		p.images = $scope.images;
 		p.sounds = $scope.sounds;
 		p.location = $scope.data.location;
+		p.title = $scope.data.title;
 		p.timestamp = new Date();
 		
 		LocalFileService.readArticle($scope.data.article.id).then(function(success){
@@ -889,6 +891,10 @@ angular.module('starter.controllers', [])
 			alert(JSON.stringify(error));
 		});
 	}
+	
+	$scope.gotoArticles = function(){
+		$state.go("myarticles");
+	};
 	
 	$scope.removeParagraph = function(uuid){
 		var idx = -1;

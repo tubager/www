@@ -25,7 +25,7 @@
 	   		<div class="tbg-p-header">
 		   		<div class="tbg-p-title">{{p.title}}</div>
 		   		<div style="margin-bottom: -30px;margin-top:-10px;">
-		   			<div class="tbg-p-time" style="float: left;margin-top:13px;">{{p.timestamp}}</div>
+		   			<div class="tbg-p-time" style="float: left;margin-top:13px;">{{p.timestamp? p.timestamp.split(".")[0].replace("T", " ") :""}}</div>
 		   			<div style="float: right;">
 		   				<span>
 		   					<button class="button button-icon ion-android-create" style="margin-bottom: 15px" ng-click="editParagraph(chat.uuid, p.uuid)">

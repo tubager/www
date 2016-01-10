@@ -1,4 +1,4 @@
-angular.module('starter.services', ['ionic', 'ngCordova'])
+﻿angular.module('starter.services', ['ionic', 'ngCordova'])
 
 .factory('Sliders', function () {
     // Might use a resource here that returns a JSON array
@@ -98,12 +98,14 @@ angular.module('starter.services', ['ionic', 'ngCordova'])
 			});
 			return q.promise;
 		},
-		signUp: function(name, pw){
+		signUp: function(name, pw, mobile, email){
 			var q = $q.defer();
 			var server = util.server + "auth/signup";
 			var data = {
 				"userName": name,
 				"password": pw,
+				"mobile": mobile,
+				"email": email,
 				"code": ""
 			};
 			$http.post(server, data).then(function(response){
