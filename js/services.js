@@ -488,7 +488,7 @@
 		}
 	}
 }])
-.service('ArticleService',function($http){
+.service('ArticleService',['$http','$q', function($http, $q){
 	var articles;
 	return{
 		getArticles: function(){
@@ -501,23 +501,75 @@
 //					    'X-Auth-Token': "abcde"
 //					}
 //			};
+			var q = $q.defer();
 			var url = util.server + "books";
 			var token = util.profile.token;
 			return $http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token},data:{}}).then(function(items){
+				alert(JSON.stringify(items));
 				articles = items.data;
-				return articles;
+				q.resolve(articles);
+			}, function(error){
+				q.reject(error);
 			});
+			return q.promise;
 		},
 		
-		uploadArticle: function(article){
+		uploadArticle: function(data){
+			var article = {
+				"uuid": data.uuid,
+				"title": data.title,
+				"description": data.description,
+				"coverImg": data.coverImg,
+				"userName": util.profile.userName,
+				"paragraphs": []
+			};
+			if(data.paragraphs){
+				data.paragraphs.map(function(p){
+					var para = {
+						"uuid": p.uuid,
+						"title": p.title,
+						"bookUuid": data.uuid,
+						"text": p.text
+					};
+					var img = [];
+					var imgText = [];
+					if(p.images){
+						p.images.map(function(i){
+							var fileName = i.url || "";
+							fileName = fileName.substr(fileName.lastIndexOf("/")+1);
+							img.push(fileName);
+							imgText.push(i.title || "");
+						});
+					}
+					para.img = img.join(",");
+					para.imgText = imgText.join(",");
+					var audio = [];
+					if(p.sounds){
+						p.sounds.map(function(s){
+							var fileName = s.url || "";
+							fileName = fileName.substr(fileName.lastIndexOf("/")+1);
+							audio.push(fileName);
+						});
+					}
+					para.audio = audio.join(",");
+					para.location = p.location;
+					article.paragraphs.push(para);
+				});
+			}
+			//alert(JSON.stringify(article));
+			//return;
+			var q = $q.defer();
 			var url = util.server + "book";
 			var token = util.profile.token;
 			return $http.post(url,article,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(d){
-				return d;
+				q.resolve(d);
+			}, function(error){
+				q.reject(error);
 			});
+			return q.promise;
 		}
 	}
-})
+}])
 .factory('CameraService',['$q','$cordovaCamera','$cordovaImagePicker','$cordovaCapture','$cordovaBarcodeScanner', function($q,$cordovaCamera,$cordovaImagePicker,$cordovaCapture,$cordovaBarcodeScanner){
 	return {
 		getPicture: function(){

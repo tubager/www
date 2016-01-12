@@ -862,7 +862,7 @@
   
 })
 
-.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, ArticleService, LocalFileService,$ionicPopup) {
+.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, LocalFileService,$ionicPopup) {
   $scope.chat = {};
 	var articleId = $stateParams.id;
 	if(articleId == "current"){
@@ -943,8 +943,11 @@
 			$state.go("signin");
 		}
 		else{
-			ArticleService.uploadArticle(article).then(function(data){
-				console.log(data);
+			ArticleService.uploadArticle($scope.chat).then(function(data){
+				$ionicPopup.alert({
+					title: '发布成功',
+					template: "您已成功的发布了游记！"
+				});
 			});
 		}
 	};
@@ -954,7 +957,65 @@
 	};
 	
 	$scope.openShare = function(){
-		$scope.modal.show();
+		//$scope.modal.show();
+		$ionicActionSheet.show({
+			buttons: [
+				{ text: '微信朋友圈' },
+				{ text: '微信好友' }
+			],
+			titleText: '分享游记到',
+			cancelText: '取消',
+			cancel: function () {
+				// add cancel code..
+			},
+			buttonClicked: function (index) {
+				if(index == 0){
+					//share to timeline
+					Wechat.share({
+						message: {
+							title: "用途八哥写的游记",
+							description: "很好玩儿啊.",
+							thumb: "www/img/thumbnail.png",
+							mediaTagName: "TEST-TAG-001",
+							messageExt: "这是第三方带的测试字段",
+							messageAction: "<action>dotalist</action>",
+							media: {
+								type: Wechat.Type.LINK,
+								webpageUrl: "http://tech.qq.com/zt2012/tmtdecode/252.htm"
+							}
+						},
+						scene: Wechat.Scene.TIMELINE   // share to Timeline
+					}, function () {
+						alert("Success");
+					}, function (reason) {
+						alert("Failed: " + reason);
+					});
+				}
+				else if(index == 1){
+					//share to friends
+					Wechat.share({
+						message: {
+							title: "用途八哥写的游记",
+							description: "很好玩儿啊.",
+							thumb: "www/img/thumbnail.png",
+							mediaTagName: "TEST-TAG-001",
+							messageExt: "这是第三方带的测试字段",
+							messageAction: "<action>dotalist</action>",
+							media: {
+								type: Wechat.Type.LINK,
+								webpageUrl: "http://tech.qq.com/zt2012/tmtdecode/252.htm"
+							}
+						},
+						scene: Wechat.Scene.SESSION   // share to Timeline
+					}, function () {
+						alert("Success");
+					}, function (reason) {
+						alert("Failed: " + reason);
+					});
+				}
+				return true;
+			}
+		});
 	};
 	
 	$scope.closeShare = function(){
