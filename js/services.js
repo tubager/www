@@ -211,7 +211,7 @@
 			$http.get(server).then(function(success){
 				//alert("连接成功");
 			}, function(error){
-				alert(JSON.stringify(error));
+				alert("网络连接失败");
 			});
 		}
 	}
@@ -313,13 +313,99 @@
 			var oldDir = url.substr(0,url.lastIndexOf("/")+1);
 			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
 			var newName = util.getUuid() + "." + fileName.split(".")[1];
+			$cordovaFile.checkFile(oldDir, fileName).then(function(){
+				alert("found " + url);
+			}, function(){
+				alert("not found " + url);
+			});
 			$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory + uuid + "/", newName)
 			.then(function (success) {
 				// success
+				alert("file copied");
 				data.url = cordova.file.dataDirectory + uuid + "/" + newName;
 				q.resolve(data);
 			}, function (error) {
+				alert(JSON.stringify(error));
 				q.reject(error);
+			});
+			return q.promise;
+		},
+		
+		getLocalArticles: function(){
+			var q = $q.defer();
+			$cordovaFile.checkFile(cordova.file.dataDirectory, "local_article.json")
+			.then(function (success) {
+				$cordovaFile.readAsText(cordova.file.dataDirectory, "local_article.json")
+				.then(function (txt) {
+					var articles;
+					if(txt == ""){
+						articles = [];
+					}
+					else{
+						articles = JSON.parse(txt);
+					}
+					q.resolve(articles);
+				}, function (err) {
+					q.reject(err);
+				});
+			}, function (error) {
+				$cordovaFile.createFile(cordova.file.dataDirectory, "local_article.json", true)
+				.then(function (success) {
+					q.resolve([]);
+				}, function (error) {
+					q.reject(error);
+				});
+			});
+			return q.promise;
+		},
+		
+		updateLocalArticles: function(article, op){
+			var q = $q.defer();
+			var articles;
+			this.getLocalArticles()
+			.then(function (result) {
+				articles = result;
+				var a;
+				for(var i=0; i<articles.length; i++){
+					if(articles[i].uuid == article.uuid){
+						a = articles[i];
+						break;
+					}
+				}
+				if(op == "add"){
+					if(a){
+						a.uuid = article.uuid;
+						a.title = article.title;
+						a.description = article.description;
+						a.coverImg = article.coverImg;
+					}
+					else{
+						articles.splice(0,0,{
+							uuid: article.uuid,
+							title: article.title,
+							description: article.description,
+							coverImg: article.coverImg
+						});
+					}
+				}
+				else if(op == "remove"){
+					if(a){
+						var idx = articles.indexOf(a);
+						if(idx >= 0){
+							articles.splice(idx, 1);
+						}
+					}
+				}
+				if(articles){
+					$cordovaFile.writeFile(cordova.file.dataDirectory, "local_article.json", JSON.stringify(articles),true)
+					.then(function (success) {
+						q.resolve(articles);
+					}, function (error) {
+						q.reject(error);
+					});
+				}
+			}, function (err) {
+				q.reject(err);
 			});
 			return q.promise;
 		},
@@ -384,7 +470,6 @@
 				article.description = description;
 				$cordovaFile.writeFile(cordova.file.dataDirectory + uuid + "/", uuid + ".json", JSON.stringify(article), true)
 				.then(function (success) {
-					alert("CoverImg updated for article " + uuid);
 					q.resolve(success);
 				}, function (error) {
 					q.reject(error);
@@ -447,7 +532,56 @@
 				p.sounds.map(function(s){
 					if(s.url.indexOf(uuid) < 0){
 						count ++;
-						that.copyResource(s, uuid).then(function(s){
+						
+						var url = s.url;
+						var oldDir = url.substr(0,url.lastIndexOf("/")+1);
+						var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
+						var newName = util.getUuid() + "." + fileName.split(".")[1];
+						window.resolveLocalFileSystemURL(url, function(fileEntry){
+							fileEntry.file(function(file) {
+								var reader = new FileReader();
+								reader.onloadend = function(e) {
+									var content = this.result;
+									$cordovaFile.writeFile(cordova.file.dataDirectory + uuid + "/", newName, content, true).then(function(){
+										s.url = cordova.file.dataDirectory + uuid + "/" + newName;
+										count--;
+										if(flag && count == 0){
+											q.resolve({});
+										}
+									}, function(ee){
+										count--;
+										if(flag && count == 0){
+											q.resolve({});
+										}
+									});
+								};
+								reader.readAsArrayBuffer(file);
+							});
+						}, function(error){
+							
+						});
+						/*$cordovaFile.readAsArrayBuffer(oldDir, fileName).then(function(data){
+							alert("readAsArrayBuffer");
+							alert(cordova.file.externalRootDirectory);
+							$cordovaFile.writeFile(cordova.file.dataDirectory + uuid + "/", newName, data, true).then(function(){
+								alert("copy success");
+								s.url = cordova.file.dataDirectory + uuid + "/" + newName;
+								count--;
+								if(flag && count == 0){
+									q.resolve({});
+								}
+							}, function(ee){
+								alert(JSON.stringify(ee));
+								count--;
+								if(flag && count == 0){
+									q.resolve({});
+								}
+							});
+						}, function(error){
+							alert(JSON.stringify(error));
+							alert(oldDir + fileName);
+						});
+						that.copyResource(s, uuid).then(function(ss){
 							count--;
 							if(flag && count == 0){
 								q.resolve({});
@@ -457,7 +591,7 @@
 							if(flag && count == 0){
 								q.resolve({});
 							}
-						});
+						});*/
 					}
 				});
 			});
@@ -475,7 +609,7 @@
 				that.beforeSave(article, uuid).then(function(){
 					$cordovaFile.writeFile(cordova.file.dataDirectory + uuid + "/", uuid + ".json", JSON.stringify(article), true)
 					.then(function (success) {
-						q.resolve(success);
+						q.resolve(article);
 					}, function (error) {
 						q.reject(error);
 					});
@@ -488,7 +622,7 @@
 		}
 	}
 }])
-.service('ArticleService',['$http','$q', function($http, $q){
+.service('ArticleService',['$http','$q', '$cordovaFileTransfer', '$cordovaFile', function($http, $q, $cordovaFileTransfer, $cordovaFile){
 	var articles;
 	return{
 		getArticles: function(){
@@ -504,8 +638,9 @@
 			var q = $q.defer();
 			var url = util.server + "books";
 			var token = util.profile.token;
-			return $http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token},data:{}}).then(function(items){
-				alert(JSON.stringify(items));
+			
+			$http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token},data:{}}).then(function(items){
+				
 				articles = items.data;
 				q.resolve(articles);
 			}, function(error){
@@ -514,15 +649,95 @@
 			return q.promise;
 		},
 		
+		checkDir: function(dir){
+			var q = $q.defer();
+			$cordovaFile.checkDir(cordova.file.dataDirectory, dir)
+			.then(function (success) {
+				q.resolve(success);
+			}, function (e) {
+				$cordovaFile.createDir(cordova.file.dataDirectory, dir, true)
+				.then(function (s) {
+					q.resolve(s);
+				}, function (error) {
+					q.reject(error);
+				});
+			});
+			return q.promise;
+		},
+		
+		downloadArticle: function(uuid){
+			var q = $q.defer();
+			this.checkDir(uuid).then(function(success){
+				var url = util.server + "book/" + uuid;
+				var basePath = cordova.file.dataDirectory + uuid + "/";
+				var filePath = basePath + uuid + ".json";
+				var token = util.profile.token;
+				var options = {};
+				options.headers={'X-Auth-Token': token};
+				
+				$cordovaFileTransfer.download(url, filePath, options, true).then(function(result){
+					$cordovaFile.readAsText(cordova.file.dataDirectory + uuid + "/", uuid + ".json")
+					.then(function (txt) {
+						var article = JSON.parse(txt);
+						//downloading cover image
+						url = util.server + "resource/filebyname?name=" + article.coverImg;
+						filePath = basePath + article.coverImg;
+						options = {};
+						$cordovaFileTransfer.download(url, filePath, options, true);
+						article.coverImg = filePath;
+						//downloading paragraph images
+						var imgList = [];
+						article.paragraphs.map(function(p){
+							var imgs = p.img.split(",");
+							var txts = p.imgText.split(",");
+							p.images = [];
+							for(var i=0; i<imgs.length; i++){
+								p.images.push({url: basePath + imgs[i], title: txts[i] || ""});
+							}
+							var audios = p.audio.split(",");
+							p.sounds = [];
+							for(var i=0; i<audios.length; i++){
+								p.sounds.push({url: basePath + audios[i], title:""});
+							}
+						});
+						$cordovaFile.writeFile(cordova.file.dataDirectory + uuid + "/", uuid + ".json", JSON.stringify(article), true)
+						.then(function(){
+							//alert("article saved");
+						}, function(error){
+							//alert("save article failed");
+						});
+						q.resolve(article);
+					}, function (err) {
+						q.reject(err);
+					});
+				}, function(error){
+					q.reject(error);
+				}, function(progress){
+					
+				});
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		
 		uploadArticle: function(data){
+			var coverImg = data.coverImg || "";
+			coverImg = coverImg.substr(coverImg.lastIndexOf("/")+1);
 			var article = {
 				"uuid": data.uuid,
 				"title": data.title,
 				"description": data.description,
-				"coverImg": data.coverImg,
+				"coverImg": coverImg,
 				"userName": util.profile.userName,
 				"paragraphs": []
 			};
+			var imgList = [];
+			var audioList = [];
+			if(data.coverImg){
+				imgList.push({"fileName": coverImg, "paragraph": ""});
+			}
+			
 			if(data.paragraphs){
 				data.paragraphs.map(function(p){
 					var para = {
@@ -538,6 +753,7 @@
 							var fileName = i.url || "";
 							fileName = fileName.substr(fileName.lastIndexOf("/")+1);
 							img.push(fileName);
+							imgList.push({"fileName": fileName, "paragraph": p.uuid});
 							imgText.push(i.title || "");
 						});
 					}
@@ -549,6 +765,7 @@
 							var fileName = s.url || "";
 							fileName = fileName.substr(fileName.lastIndexOf("/")+1);
 							audio.push(fileName);
+							audioList.push({"fileName": fileName, "paragraph": p.uuid});
 						});
 					}
 					para.audio = audio.join(",");
@@ -561,10 +778,59 @@
 			var q = $q.defer();
 			var url = util.server + "book";
 			var token = util.profile.token;
-			return $http.post(url,article,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(d){
-				q.resolve(d);
+			var idx = imgList.length + audioList.length;
+			$http.post(url,article,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(d){
+				if(idx == 0){
+					q.resolve(d);
+				}
 			}, function(error){
 				q.reject(error);
+			});
+			url = util.server + "upload";
+			
+			imgList.map(function(data){
+				var options = new FileUploadOptions();
+				options.fileKey = "file";
+				options.fileName = data.fileName;
+				options.mimeType = "image/jpeg";
+				options.httpMethod = "POST";
+				options.params = {"paragraph": data.paragraph, "article": article.uuid, "resourceType": "image"};
+				options.headers={'X-Auth-Token': token};
+				var fileURL = cordova.file.dataDirectory + article.uuid + "/" + options.fileName;
+				var ft = new FileTransfer();
+				ft.upload(fileURL, encodeURI(url), function(r){
+					idx--;
+					if(idx <= 0){
+						q.resolve({});
+					}
+				}, function(error){
+					idx--;
+					if(idx <= 0){
+						q.resolve({});
+					}
+				}, options);
+			});
+			audioList.map(function(data){
+				var options = new FileUploadOptions();
+				options.fileKey = "file";
+				options.fileName = data.fileName;
+				options.mimeType = "audio/x-mpeg";
+				options.httpMethod = "POST";
+				options.params = {"paragraph": data.paragraph, "article": article.uuid, "resourceType": "audio"};
+				options.headers={'X-Auth-Token': token};
+				var fileURL = cordova.file.dataDirectory + article.uuid + "/" + options.fileName;
+				var ft = new FileTransfer();
+				ft.upload(fileURL, encodeURI(url), function(r){
+					idx--;
+					if(idx <= 0){
+						q.resolve({});
+					}
+				}, function(error){
+					idx--;
+					if(idx <= 0){
+						q.resolve({});
+					}
+				}, options);
 			});
 			return q.promise;
 		}

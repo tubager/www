@@ -3,9 +3,9 @@
 .controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading, ArticleService,LocalFileService, FileService) {
     $scope.sliders = Sliders.all();
     $scope.chats = Sliders.chats();
-    ArticleService.getArticles().then(function(data){
-    	$scope.chats = data;
-    });
+	
+	
+	
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
     	
@@ -32,6 +32,32 @@
 		
 		LocalFileService.getProfile().then(function(profile){
 			util.profile = profile;
+			LocalFileService.getLocalArticles().then(function(data){
+				if(data.length > 0){
+					$scope.chats = data;
+				}
+				
+			}, function(error){
+				
+			});
+			
+			 ArticleService.getArticles().then(function(data){
+				 data.map(function(d){
+					 d.coverImg = util.server + "resource/filebyname?name=" + d.coverImg;
+					 //alert("downloading " + d.uuid);
+					 ArticleService.downloadArticle(d.uuid).then(function(article){
+						 LocalFileService.updateLocalArticles(article, "add").then(function(data){
+						}, function(error){
+							
+						});
+					 }, function(){});
+				 });
+				if(data.length > 0){
+					$scope.chats = data;
+				}
+			}, function(error){
+				
+			});
 		}, function(error){
 			//alert(JSON.stringify(error));
 		});
@@ -571,7 +597,7 @@
 				currentArticle.paragraphs.push(p);
 			}
 			
-			LocalFileService.saveArticle(currentArticle, currentArticle.uuid).then(function(success){
+			LocalFileService.saveArticle(currentArticle, currentArticle.uuid).then(function(article){
 				$state.go('timeline', {id: currentArticle.uuid});
 			}, function(error){
 				
@@ -948,6 +974,8 @@
 					title: '发布成功',
 					template: "您已成功的发布了游记！"
 				});
+			}, function(){
+				alert("upload failed");
 			});
 		}
 	};
