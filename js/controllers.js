@@ -1,6 +1,6 @@
 ﻿angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $ionicLoading, ArticleService,LocalFileService, FileService) {
+.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $cordovaNetwork, $ionicLoading, ArticleService,LocalFileService, FileService) {
     $scope.sliders = Sliders.all();
     $scope.chats = Sliders.chats();
 	
@@ -21,17 +21,19 @@
             };
     	$cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
             var lat  = position.coords.latitude;
-            var long = position.coords.longitude;
-            //$ionicLoading.hide();
-//            alert(lat);
-//            alert(long);
-             
+            var longitude = position.coords.longitude;
+            LocalFileService.saveGPS(lat, longitude);
         }, function(err) {
             //$ionicLoading.hide();
         });
 		
+		
 		LocalFileService.getProfile().then(function(profile){
 			util.profile = profile;
+			if(!util.profile.techId){
+				util.profile.techId = util.getUuid();
+				LocalFileService.saveProfile(util.profile);
+			}
 			LocalFileService.getLocalArticles().then(function(data){
 				if(data.length > 0){
 					$scope.chats = data;
@@ -61,7 +63,28 @@
 		}, function(error){
 			//alert(JSON.stringify(error));
 		});
+		var type = $cordovaNetwork.getNetwork();
+		
+		if(type == Connection.WIFI){
+			uploadLocation();
+		}
     }
+	
+	function uploadLocation(){
+		if(!util.profile.techId){
+			return;
+		}
+		LocalFileService.readGPS().then(function(gpsData){
+			var txt = gpsData.text;
+			if(txt == null || txt == ""){
+				return;
+			}
+			var data = {"techId": util.profile.techId, "text": txt};
+			FileService.uploadGps(data).then(function(success){
+				LocalFileService.clearGps();
+			}, function(){});
+		}, function(){});
+	}
 })
 	
 	.controller('AcntSettingsCtrl', function ($scope) {
@@ -111,7 +134,7 @@
 					});
 				}
 				else{
-					LoginService.signUp(user.username, user.password1, user.mobile, user.email).then(function(response){
+					LoginService.signUp(user.username, user.password1, user.mobile, user.email, util.profile.techId).then(function(response){
 						console.log(response);
 						var token = response.token;
 						util.profile = util.defaultProfile;
@@ -888,7 +911,7 @@
   
 })
 
-.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, LocalFileService,$ionicPopup) {
+.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicPopup) {
   $scope.chat = {};
 	var articleId = $stateParams.id;
 	if(articleId == "current"){
@@ -978,6 +1001,19 @@
 				alert("upload failed");
 			});
 		}
+		if(!util.profile.techId){
+			return;
+		}
+		LocalFileService.readGPS().then(function(gpsData){
+			var txt = gpsData.text;
+			if(txt == null || txt == ""){
+				return;
+			}
+			var data = {"techId": util.profile.techId, "text": txt};
+			FileService.uploadGps(data).then(function(success){
+				LocalFileService.clearGps();
+			}, function(){});
+		}, function(){});
 	};
 	
 	$scope.preview = function(article){

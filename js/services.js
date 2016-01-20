@@ -98,7 +98,7 @@
 			});
 			return q.promise;
 		},
-		signUp: function(name, pw, mobile, email){
+		signUp: function(name, pw, mobile, email, techId){
 			var q = $q.defer();
 			var server = util.server + "auth/signup";
 			var data = {
@@ -106,7 +106,8 @@
 				"password": pw,
 				"mobile": mobile,
 				"email": email,
-				"code": ""
+				"code": "",
+				"techId": techId
 			};
 			$http.post(server, data).then(function(response){
 				var token = response.data.token;
@@ -206,6 +207,16 @@
 			});
 			return q.promise;
 		},
+		uploadGps: function(data){
+			var q = $q.defer();
+			var server = util.server + "resource/ullist";
+			$http.post(server, data, {headers:{'Accept': 'application/json;charset=UTF-8'}}).then(function(response){
+				q.resolve({});
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
+		},
 		testConnection: function(){
 			var server = util.server + "auth/connection";
 			$http.get(server).then(function(success){
@@ -218,6 +229,57 @@
 }])
 .service('LocalFileService', ['$q','$cordovaFile', function($q, $cordovaFile){
 	return {
+		checkGPS: function(){
+			var q = $q.defer();
+			$cordovaFile.checkFile(cordova.file.dataDirectory, "trace.txt")
+			.then(function(success){
+				q.resolve({});
+			}, function(error){
+				$cordovaFile.createFile(cordova.file.dataDirectory, "trace.txt", true)
+				.then(function (s) {
+					q.resolve({});
+				}, function (e) {
+					q.reject(e);
+				});
+			});
+			return q.promise;
+		},
+		clearGps: function(){
+			var q = $q.defer();
+			$cordovaFile.writeFile(cordova.file.dataDirectory, "trace.txt", "", true)
+			.then(function (success) {
+				q.resolve(success);
+			}, function (error) {
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		saveGPS: function(latitude, longitude){
+			var q = $q.defer();
+			var date = new Date();
+			var txt = latitude + "," + longitude + "," + date.getTime() + ";";
+			this.checkGPS().then(function(){
+				$cordovaFile.writeExistingFile(cordova.file.dataDirectory, "trace.txt", txt)
+				.then(function(){
+					q.resolve({});
+				}, function(e){
+					q.reject(e);
+				});
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		readGPS: function(){
+			var q = $q.defer();
+			$cordovaFile.readAsText(cordova.file.dataDirectory, "trace.txt")
+			.then(function(txt){
+				q.resolve({text: txt});
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
+		},
 		getProfile: function(){
 			var q = $q.defer();
 			$cordovaFile.checkFile(cordova.file.dataDirectory, "profile.json")
