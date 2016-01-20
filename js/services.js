@@ -698,7 +698,7 @@
 //					}
 //			};
 			var q = $q.defer();
-			var url = util.server + "books";
+			var url = util.server + "resource/books";
 			var token = util.profile.token;
 			
 			$http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token},data:{}}).then(function(items){

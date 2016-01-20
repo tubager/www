@@ -1059,15 +1059,15 @@
 					//share to friends
 					Wechat.share({
 						message: {
-							title: "用途八哥写的游记",
-							description: "很好玩儿啊.",
+							title: "我的一小步，途八哥的一大步",
+							description: "用途八哥写的游记",
 							thumb: "www/img/thumbnail.png",
-							mediaTagName: "TEST-TAG-001",
+							mediaTagName: "",
 							messageExt: "这是第三方带的测试字段",
-							messageAction: "<action>dotalist</action>",
+							messageAction: "<action></action>",
 							media: {
 								type: Wechat.Type.LINK,
-								webpageUrl: "http://tech.qq.com/zt2012/tmtdecode/252.htm"
+								webpageUrl: "http://120.25.68.228:8080/pages/index.html?uuid=A20160112T063410720Z93"
 							}
 						},
 						scene: Wechat.Scene.SESSION   // share to Timeline
