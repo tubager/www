@@ -1,0 +1,45 @@
+<!--
+  This template loads for the 'tab.friend-detail' state (app.js)
+  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
+  The FriendsCtrl pulls data from the Friends service (service.js)
+  The Friends service returns an array of friend data
+-->
+<ion-view>
+	<ion-nav-title>
+		<p>{{chat.title}}</p>
+	</ion-nav-title>
+	<ion-nav-buttons side="left">
+		<button class="button back-button button-icon ion-arrow-left-c header-item" ng-click="$ionicGoBack()">
+        </button>
+	</ion-nav-buttons>
+  <ion-content class="">
+  	  <h4 class="tbg-timeline-title">{{chat.title}}</h4>
+	  <div class="tbg-p-list" style="margin:10px;">
+	   	<div class="tbg-p" ng-repeat="p in chat.paragraphs" type="item-text-wrap">
+	   		<div class="tbg-p-header">
+		   		<div class="tbg-p-title">{{p.title}}</div>
+		   		<div style="margin-bottom: -30px;margin-top:-10px;">
+		   			<div class="tbg-p-time" style="float: left;margin-top:13px;">{{p.timestamp? p.timestamp.split(".")[0].replace("T", " ") :""}}</div>
+		   			
+		   			<div style="clear:both;"></div>
+		   		</div>
+	   		</div>
+	   		<div class="tbg-p-divider"></div>
+	   		<div class="tbg-p-body">
+		   		<div class="" ng-repeat="img in p.images" type="item-text-wrap">
+		   			<img src="{{img.url}}" style="max-width:100%;"/>
+		   			<p>{{img.title}}</p>
+		   		</div>
+		   		<p>{{p.text}}</p>
+		   		<div ng-if="p.vedio != null">
+		   			<video ng-src="{{p.vedio}}" style="width:100%;" controls="controls"></video>
+		   		</div>
+		   		<div class="" ng-repeat="sound in p.sounds" type="item-text-wrap">
+		   			<audio src="{{sound.url}}" style="width:80%;margin-top:8px;" controls="controls"></audio>
+		   			<p>{{sound.title}}</p>
+		   		</div>
+	   		</div>
+	   	</div>
+	  </div>
+  </ion-content>
+</ion-view>

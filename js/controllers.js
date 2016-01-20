@@ -911,6 +911,20 @@
   
 })
 
+.controller('ViewArticleCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicPopup) {
+  $scope.chat = {};
+	var articleId = $stateParams.id;
+	LocalFileService.readArticle(articleId).then(function(data){
+		$scope.chat = data;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	}, function(error){
+		alert(JSON.stringify(error));
+	});
+	
+})
+
 .controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicPopup) {
   $scope.chat = {};
 	var articleId = $stateParams.id;

@@ -42,6 +42,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       templateUrl: 'templates/timeline.html',
       controller: 'TimelineCtrl'
   })
+  .state('viewarticle',{
+	  cache: false,
+	  url: '/viewarticle/:id',
+      templateUrl: 'templates/article.html',
+      controller: 'ViewArticleCtrl'
+  })
   .state('myarticles',{
 	  cache: false,
 	  url: '/myarticles',
