@@ -27,50 +27,53 @@
             //$ionicLoading.hide();
         });
 		
-		
 		LocalFileService.getProfile().then(function(profile){
 			util.profile = profile;
 			if(!util.profile.techId){
 				util.profile.techId = util.getUuid();
 				LocalFileService.saveProfile(util.profile);
 			}
-			LocalFileService.getLocalArticles().then(function(data){
-				if(data.length > 0){
-					$scope.chats = data;
-				}
-				
-			}, function(error){
-				
-			});
-			
+			getLocalArticles();
+			uploadLocation();
 			 ArticleService.getArticles().then(function(data){
 				 data.map(function(d){
+					 for(var i=0; i<$scope.chats.length; i++){
+						 if($scope.chats[i].uuid == d.uuid){
+							 return;
+						 }
+					 }
 					 d.coverImg = util.server + "resource/filebyname?name=" + d.coverImg;
-					 //alert("downloading " + d.uuid);
 					 ArticleService.downloadArticle(d.uuid).then(function(article){
-						 LocalFileService.updateLocalArticles(article, "add").then(function(data){
+						LocalFileService.updateLocalArticles(article, "add").then(function(data){
+							getLocalArticles();
 						}, function(error){
 							
 						});
 					 }, function(){});
 				 });
-				if(data.length > 0){
-					$scope.chats = data;
-				}
 			}, function(error){
-				
 			});
 		}, function(error){
-			//alert(JSON.stringify(error));
 		});
-		var type = $cordovaNetwork.getNetwork();
-		
-		if(type == Connection.WIFI){
-			uploadLocation();
-		}
     }
 	
+	function getLocalArticles(){
+		LocalFileService.getLocalArticles().then(function(data){
+			if(data.length > 0){
+				$scope.chats = data;
+			}
+			
+		}, function(error){
+			
+		});
+	}
+	
 	function uploadLocation(){
+		var type = $cordovaNetwork.getNetwork();
+		if(type != Connection.WIFI){
+			return;
+		}
+		
 		if(!util.profile.techId){
 			return;
 		}
@@ -105,6 +108,8 @@
 						util.profile.email = user.email;
 						util.profile.gender = user.gender || "M";
 						util.profile.lastWord = user.lastWord;
+						util.profile.techId = user.techId;
+						util.profile.img = user.img;
 						LocalFileService.saveProfile(util.profile).then(function(success){
 							$state.go('tab.account');
 						}, function(e){
@@ -926,7 +931,7 @@
 })
 
 .controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicPopup) {
-  $scope.chat = {};
+    $scope.chat = {};
 	var articleId = $stateParams.id;
 	if(articleId == "current"){
 		LocalFileService.listArticles().then(function(data){
@@ -1034,6 +1039,62 @@
 		self.location = "preview/leaves/leaves1.html";
 	};
 	
+	function shareArticle(index){
+		var loggedIn = util.isLoggedIn();
+		if(!loggedIn){
+			$state.go("signin");
+			return;
+		}
+		ArticleService.uploadArticle($scope.chat).then(function(data){
+			if(index == 0){
+				//share to timeline
+				Wechat.share({
+					message: {
+						title: $scope.chat.title || "",
+						description: $scope.chat.description || "来自途八哥的游记",
+						thumb: "www/img/thumbnail.png",
+						mediaTagName: "TEST-TAG-001",
+						messageExt: "这是第三方带的测试字段",
+						messageAction: "<action></action>",
+						media: {
+							type: Wechat.Type.LINK,
+							webpageUrl: "http://120.25.68.228:8080/pages/index.html?uuid=" + articleId
+						}
+					},
+					scene: Wechat.Scene.TIMELINE   // share to Timeline
+				}, function () {
+					//alert("Success");
+				}, function (reason) {
+					//alert("Failed: " + reason);
+				});
+			}
+			else if(index == 1){
+				//share to friends
+				Wechat.share({
+					message: {
+						title: $scope.chat.title || "",
+						description: $scope.chat.description || "来自途八哥的游记",
+						thumb: "www/img/thumbnail.png",
+						mediaTagName: "",
+						messageExt: "这是第三方带的测试字段",
+						messageAction: "<action></action>",
+						media: {
+							type: Wechat.Type.LINK,
+							webpageUrl: "http://120.25.68.228:8080/pages/index.html?uuid=" + articleId
+						}
+					},
+					scene: Wechat.Scene.SESSION   // share to Timeline
+				}, function () {
+					alert("Success");
+				}, function (reason) {
+					alert("Failed: " + reason);
+				});
+			}
+		}, function(){
+			alert("发布游记失败");
+		});
+	}
+	
 	$scope.openShare = function(){
 		//$scope.modal.show();
 		$ionicActionSheet.show({
@@ -1047,50 +1108,7 @@
 				// add cancel code..
 			},
 			buttonClicked: function (index) {
-				if(index == 0){
-					//share to timeline
-					Wechat.share({
-						message: {
-							title: "用途八哥写的游记",
-							description: "很好玩儿啊.",
-							thumb: "www/img/thumbnail.png",
-							mediaTagName: "TEST-TAG-001",
-							messageExt: "这是第三方带的测试字段",
-							messageAction: "<action>dotalist</action>",
-							media: {
-								type: Wechat.Type.LINK,
-								webpageUrl: "http://tech.qq.com/zt2012/tmtdecode/252.htm"
-							}
-						},
-						scene: Wechat.Scene.TIMELINE   // share to Timeline
-					}, function () {
-						alert("Success");
-					}, function (reason) {
-						alert("Failed: " + reason);
-					});
-				}
-				else if(index == 1){
-					//share to friends
-					Wechat.share({
-						message: {
-							title: "我的一小步，途八哥的一大步",
-							description: "用途八哥写的游记",
-							thumb: "www/img/thumbnail.png",
-							mediaTagName: "",
-							messageExt: "这是第三方带的测试字段",
-							messageAction: "<action></action>",
-							media: {
-								type: Wechat.Type.LINK,
-								webpageUrl: "http://120.25.68.228:8080/pages/index.html?uuid=A20160112T063410720Z93"
-							}
-						},
-						scene: Wechat.Scene.SESSION   // share to Timeline
-					}, function () {
-						alert("Success");
-					}, function (reason) {
-						alert("Failed: " + reason);
-					});
-				}
+				
 				return true;
 			}
 		});

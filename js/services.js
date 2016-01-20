@@ -179,7 +179,22 @@
 			var server = util.server + "user";
 			var token = util.profile.token;
 			$http.get(server, {headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token}}).then(function(user){
-				q.resolve(user.data);
+				if(user.data.img){
+					var url = util.server + "resource/filebyname?name=" + user.data.img;
+					var filePath = cordova.file.dataDirectory + user.data.img;
+					var options = {};
+					user.data.img = cordova.file.dataDirectory + user.data.img;
+					$cordovaFileTransfer.download(url, filePath, options, true)
+					.then(function(){
+						q.resolve(user.data);
+					}, function(){
+						q.resolve(user.data);
+					});
+				}
+				else{
+					q.resolve(user.data);
+				}
+				
 			}, function(error){
 				q.reject(error);
 			});
@@ -220,9 +235,9 @@
 		testConnection: function(){
 			var server = util.server + "auth/connection";
 			$http.get(server).then(function(success){
-				//alert("连接成功");
+				
 			}, function(error){
-				alert("网络连接失败");
+				
 			});
 		}
 	}
@@ -376,18 +391,18 @@
 			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
 			var newName = util.getUuid() + "." + fileName.split(".")[1];
 			$cordovaFile.checkFile(oldDir, fileName).then(function(){
-				alert("found " + url);
+				//alert("found " + url);
 			}, function(){
-				alert("not found " + url);
+				//alert("not found " + url);
 			});
 			$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory + uuid + "/", newName)
 			.then(function (success) {
 				// success
-				alert("file copied");
+				//alert("file copied");
 				data.url = cordova.file.dataDirectory + uuid + "/" + newName;
 				q.resolve(data);
 			}, function (error) {
-				alert(JSON.stringify(error));
+				//alert(JSON.stringify(error));
 				q.reject(error);
 			});
 			return q.promise;
@@ -730,7 +745,7 @@
 		downloadArticle: function(uuid){
 			var q = $q.defer();
 			this.checkDir(uuid).then(function(success){
-				var url = util.server + "book/" + uuid;
+				var url = util.server + "resource/book/" + uuid;
 				var basePath = cordova.file.dataDirectory + uuid + "/";
 				var filePath = basePath + uuid + ".json";
 				var token = util.profile.token;
@@ -745,8 +760,10 @@
 						url = util.server + "resource/filebyname?name=" + article.coverImg;
 						filePath = basePath + article.coverImg;
 						options = {};
-						$cordovaFileTransfer.download(url, filePath, options, true);
-						article.coverImg = filePath;
+						if(article.coverImg != "img/travel-default.png"){
+							$cordovaFileTransfer.download(url, filePath, options, true);
+							article.coverImg = filePath;
+						}
 						//downloading paragraph images
 						var imgList = [];
 						article.paragraphs.map(function(p){
@@ -755,11 +772,19 @@
 							p.images = [];
 							for(var i=0; i<imgs.length; i++){
 								p.images.push({url: basePath + imgs[i], title: txts[i] || ""});
+								url = util.server + "resource/filebyname?name=" + imgs[i];
+								filePath = basePath + imgs[i];
+								options = {};
+								$cordovaFileTransfer.download(url, filePath, options, true);
 							}
 							var audios = p.audio.split(",");
 							p.sounds = [];
 							for(var i=0; i<audios.length; i++){
 								p.sounds.push({url: basePath + audios[i], title:""});
+								url = util.server + "resource/filebyname?name=" + audios[i];
+								filePath = basePath + audios[i];
+								options = {};
+								$cordovaFileTransfer.download(url, filePath, options, true);
 							}
 						});
 						$cordovaFile.writeFile(cordova.file.dataDirectory + uuid + "/", uuid + ".json", JSON.stringify(article), true)
