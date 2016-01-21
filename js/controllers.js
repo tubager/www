@@ -930,7 +930,7 @@
 	
 })
 
-.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicPopup) {
+.controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicPopup, $ionicLoading) {
     $scope.chat = {};
 	var articleId = $stateParams.id;
 	if(articleId == "current"){
@@ -1011,13 +1011,17 @@
 			$state.go("signin");
 		}
 		else{
+			$ionicLoading.show({
+				template: '<ion-spinner icon="bubbles"></ion-spinner><br/>正在发布游记!'
+			});
 			ArticleService.uploadArticle($scope.chat).then(function(data){
+				$ionicLoading.hide();
 				$ionicPopup.alert({
 					title: '发布成功',
 					template: "您已成功的发布了游记！"
 				});
 			}, function(){
-				alert("upload failed");
+				$ionicLoading.hide();
 			});
 		}
 		if(!util.profile.techId){
@@ -1045,7 +1049,11 @@
 			$state.go("signin");
 			return;
 		}
+		$ionicLoading.show({
+            template: '<ion-spinner icon="bubbles"></ion-spinner><br/>正在发布游记!'
+        });
 		ArticleService.uploadArticle($scope.chat).then(function(data){
+			$ionicLoading.hide();
 			if(index == 0){
 				//share to timeline
 				Wechat.share({
@@ -1058,7 +1066,7 @@
 						messageAction: "<action></action>",
 						media: {
 							type: Wechat.Type.LINK,
-							webpageUrl: "http://120.25.68.228:8080/pages/index.html?uuid=" + articleId
+							webpageUrl: "http://120.25.68.228:8080/pages/index.html?uuid=" + $scope.chat.uuid
 						}
 					},
 					scene: Wechat.Scene.TIMELINE   // share to Timeline
@@ -1080,7 +1088,7 @@
 						messageAction: "<action></action>",
 						media: {
 							type: Wechat.Type.LINK,
-							webpageUrl: "http://120.25.68.228:8080/pages/index.html?uuid=" + articleId
+							webpageUrl: "http://120.25.68.228:8080/pages/index.html?uuid=" + $scope.chat.uuid
 						}
 					},
 					scene: Wechat.Scene.SESSION   // share to Timeline
@@ -1091,7 +1099,7 @@
 				});
 			}
 		}, function(){
-			alert("发布游记失败");
+			$ionicLoading.hide();
 		});
 	}
 	
@@ -1108,7 +1116,7 @@
 				// add cancel code..
 			},
 			buttonClicked: function (index) {
-				
+				shareArticle(index);
 				return true;
 			}
 		});
