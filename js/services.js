@@ -703,23 +703,25 @@
 	var articles;
 	return{
 		getArticles: function(){
-//			var req = {
-//					method: 'GET',
-//					url: 'http://jsonplaceholder.typicode.com/users',
-//					//url: 'http://localhost:8080/book/99c8ca6c63f14b3f8bb85510bcdaae04',
-//					headers: {
-//						'Content-Type': 'application/json;charset=UTF-8',
-//					    'X-Auth-Token': "abcde"
-//					}
-//			};
 			var q = $q.defer();
 			var url = util.server + "resource/books";
 			var token = util.profile.token;
 			
-			$http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token},data:{}}).then(function(items){
+			$http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8'},data:{}}).then(function(items){
 				
 				articles = items.data;
 				q.resolve(articles);
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
+		},
+		getMyArticles: function(){
+			var q = $q.defer();
+			var url = util.server + "books";
+			var token = util.profile.token;
+			$http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8','X-Auth-Token': token},data:{}}).then(function(items){
+				q.resolve(items.data);
 			}, function(error){
 				q.reject(error);
 			});

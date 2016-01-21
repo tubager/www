@@ -42,7 +42,7 @@
 							 return;
 						 }
 					 }
-					 d.coverImg = util.server + "resource/filebyname?name=" + d.coverImg;
+					 //d.coverImg = util.server + "resource/filebyname?name=" + d.coverImg;
 					 ArticleService.downloadArticle(d.uuid).then(function(article){
 						LocalFileService.updateLocalArticles(article, "add").then(function(data){
 							getLocalArticles();
@@ -93,38 +93,42 @@
 	.controller('AcntSettingsCtrl', function ($scope) {
 	})
 
-	.controller('SignInCtrl', function ($scope, LoginService, $ionicPopup, $state,LocalFileService, FileService) {
+	.controller('SignInCtrl', function ($scope, LoginService, $ionicPopup, $state,LocalFileService, FileService, $ionicLoading) {
 		$scope.user = {};
 		$scope.submitted = false;
 
 		$scope.signIn = function () {
-			if (true) {
-				LoginService.signIn($scope.user.username, $scope.user.password).then(function(response){
-					var token = response.token;
-					util.profile.token = token;
-					util.profile.userName = $scope.user.username;
-					FileService.downloadProfile().then(function(user){
-						util.profile.mobile = user.mobile;
-						util.profile.email = user.email;
-						util.profile.gender = user.gender || "M";
-						util.profile.lastWord = user.lastWord;
-						util.profile.techId = user.techId;
-						util.profile.img = user.img;
-						LocalFileService.saveProfile(util.profile).then(function(success){
-							$state.go('tab.account');
-						}, function(e){
-							alert(JSON.stringify(e));
-						});
-					},function(){});
-				},function(error){
-					$ionicPopup.alert({
-						title: '登录失败!',
-						template: error.data.message
+			$ionicLoading.show({
+				template: '<ion-spinner icon="bubbles"></ion-spinner><br/>正在登录'
+			});
+			LoginService.signIn($scope.user.username, $scope.user.password).then(function(response){
+				var token = response.token;
+				util.profile.token = token;
+				util.profile.userName = $scope.user.username;
+				FileService.downloadProfile().then(function(user){
+					util.profile.mobile = user.mobile;
+					util.profile.email = user.email;
+					util.profile.gender = user.gender || "M";
+					util.profile.lastWord = user.lastWord;
+					util.profile.techId = user.techId;
+					util.profile.img = user.img;
+					LocalFileService.saveProfile(util.profile).then(function(success){
+						$ionicLoading.hide();
+						$state.go('tab.account');
+					}, function(e){
+						$ionicLoading.hide();
+						alert(JSON.stringify(e));
 					});
+				},function(){
+					$ionicLoading.hide();
 				});
-			} else {
-				$scope.signin_form.submitted = true;
-			}
+			},function(error){
+				$ionicLoading.hide();
+				$ionicPopup.alert({
+					title: '登录失败!',
+					template: error.data.message
+				});
+			});
 		};
 	})
 
@@ -1135,7 +1139,7 @@
 	};
 })
 
-.controller('AccountCtrl', function($scope, LocalFileService, $state, $ionicModal,$ionicPopup) {
+.controller('AccountCtrl', function($scope, LocalFileService, $state, $ionicModal,$ionicPopup, ArticleService, $ionicLoading) {
     $scope.profile = util.profile;
 	$scope.img = util.profile.img || "img/users/t1.jpg";
 	if(util.profile.token && util.profile.token != ""){
@@ -1181,6 +1185,40 @@
 	};
 	$scope.defaultManagement = function(){
 		$scope.defaultModal.show();
+	};
+	$scope.downloadMyArticle = function(){
+		$ionicLoading.show({
+			template: '<ion-spinner icon="bubbles"></ion-spinner><br/>正在下载我的游记'
+		});
+		var myArticles = [];
+		LocalFileService.listArticles().then(function(data){
+			myArticles = data.articles;
+			ArticleService.getMyArticles().then(function(list){
+				$ionicLoading.hide();
+				list.map(function(d){
+					for(var i=0; i<myArticles.length; i++){
+						if(myArticles[i].id == d.uuid || myArticles[i].uuid == d.uuid){
+							return;
+						}
+					}
+					$ionicLoading.show({
+						template: '<ion-spinner icon="bubbles"></ion-spinner><br/>正在下载"' + d.title + '"'
+					});
+					ArticleService.downloadArticle(d.uuid).then(function(article){
+						myArticles.push({'id': article.uuid, 'title': article.title, 'description': article.description, 'coverImg': article.coverImg});
+						data.articles = myArticles;
+						LocalFileService.saveArticleList(data);
+						$ionicLoading.hide();
+					}, function(){
+						$ionicLoading.hide();
+					});
+				});
+			}, function(){
+				$ionicLoading.hide();
+			});
+		}, function(err){
+			$ionicLoading.hide();
+		});
 	};
 	$scope.downloadManagement = function(){
 		

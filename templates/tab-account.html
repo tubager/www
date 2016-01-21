@@ -31,6 +31,10 @@
                 设置默认游记
                 <i class="icon ion-ios-book-outline" style="font-size:1.5em;color:#15D4B5;"></i>
             </ion-item>
+			<ion-item class="item-icon-left" style={{loggedIn?"display:block;":"display:none;"}} ng-click="downloadMyArticle()">
+                同步云端游记
+                <i class="icon ion-ios-loop" style="font-size:1.5em;color:#15D4B5;"></i>
+            </ion-item>
 			<ion-item class="item item-divider" style={{loggedIn?"display:block;":"display:none;"}}>
             </ion-item>
 			<ion-item class="item-icon-left" ng-click="downloadManagement()">
