@@ -771,6 +771,9 @@
 							var txts = p.imgText.split(",");
 							p.images = [];
 							for(var i=0; i<imgs.length; i++){
+								if(imgs[i] == ""){
+									continue;
+								}
 								p.images.push({url: basePath + imgs[i], title: txts[i] || ""});
 								url = util.server + "resource/filebyname?name=" + imgs[i];
 								filePath = basePath + imgs[i];
@@ -780,6 +783,9 @@
 							var audios = p.audio.split(",");
 							p.sounds = [];
 							for(var i=0; i<audios.length; i++){
+								if(audios[i] == ""){
+									continue;
+								}
 								p.sounds.push({url: basePath + audios[i], title:""});
 								url = util.server + "resource/filebyname?name=" + audios[i];
 								filePath = basePath + audios[i];
