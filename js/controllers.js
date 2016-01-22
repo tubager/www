@@ -382,8 +382,8 @@
 				buttonClicked: function (index) {
 					if(index == 0){
 						//taking photo
-						CameraService.captureImage().then(function(mediaFiles) {
-							LocalFileService.copyProfileImg(mediaFiles[0].fullPath).then(function(url){
+						CameraService.getPicture().then(function(mediaFiles) {
+							LocalFileService.copyProfileImg(mediaFiles).then(function(url){
 								$scope.user.img = url;
 								saveProfile();
 							}, function(error){});
@@ -452,7 +452,7 @@
 				if(index == 0){
 					//taking photo
 					CameraService.captureImage().then(function(mediaFiles) {
-						$scope.data.coverImg = mediaFiles[0].fullPath;
+						$scope.data.coverImg = mediaFiles;//[0].fullPath;
 					}, function(err) {
 						alert(err);
 					});
@@ -664,13 +664,8 @@
 		}
 	};
 	
-	$scope.confirmNewArticle = function(){
-		$scope.titleModel.hide();
-		var title = $scope.data.articleTitle;
-		var description = $scope.data.articleDesc;
-		var coverImg = $scope.data.coverImg;
-		var id = "A" + util.getUuid();
-		$scope.articles.splice(1,0,{'id': id, 'title': title, 'description': description, 'coverImg': coverImg});
+	function saveNewArticle(url, id, title, description){
+		$scope.articles.splice(1,0,{'id': id, 'title': title, 'description': description, 'coverImg': url});
 		$scope.data.article = $scope.articles[1];
 		if(!$scope.$$phase) {
 			$scope.$apply();
@@ -679,7 +674,7 @@
 		for(var i=1; i<$scope.articles.length; i++){
 			articleList.push($scope.articles[i]);
 		}
-		LocalFileService.saveArticle({'uuid': id, 'title': title, 'description': description, 'coverImg':coverImg, 'paragraphs': []}, id).then(function(success){
+		LocalFileService.saveArticle({'uuid': id, 'title': title, 'description': description, 'coverImg':url, 'paragraphs': []}, id).then(function(success){
 			LocalFileService.saveArticleList({'articles':articleList, 'currentArticle': id}).then(function(success){
 				doSave();
 			}, function(err){
@@ -688,7 +683,24 @@
 		}, function(error){
 			alert(JSON.stringify(error));
 		});
-		
+	}
+	
+	$scope.confirmNewArticle = function(){
+		$scope.titleModel.hide();
+		var title = $scope.data.articleTitle;
+		var description = $scope.data.articleDesc;
+		var coverImg = $scope.data.coverImg;
+		var id = "A" + util.getUuid();
+		if(coverImg == "img/travel-default.png"){
+			saveNewArticle(coverImg, id, title, description);
+		}
+		else{
+			LocalFileService.copyCoverImg(coverImg, id).then(function(url){
+				saveNewArticle(url, id, title, description);
+			}, function(e){
+				alert(JSON.stringify(e));
+			});
+		}
 	};
 	
 	$scope.changeCoverImg = function(){
@@ -705,7 +717,7 @@
 				if(index == 0){
 					//taking photo
 					CameraService.captureImage().then(function(mediaFiles) {
-						$scope.data.coverImg = mediaFiles[0].fullPath;
+						$scope.data.coverImg = mediaFiles;//[0].fullPath;
 					}, function(err) {
 						alert(err);
 					});
@@ -767,6 +779,11 @@
 	$scope.captureImage = function(){
 		$scope.modal.hide();
 	    CameraService.captureImage().then(function(mediaFiles) {
+			$scope.images.push({'url':mediaFiles, 'title':''});
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
+			/*
 		    var i, path, len;
 		    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
 		        path = mediaFiles[i].fullPath;
@@ -777,6 +794,7 @@
 					$scope.$apply();
 				  }
 		    }
+			*/
 	    }, function(err) {
 	    	alert(err);
 	    });

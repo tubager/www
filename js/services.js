@@ -372,14 +372,18 @@
 			var oldDir = url.substr(0,url.lastIndexOf("/")+1);
 			var fileName = url.substr(url.lastIndexOf("/")+1, url.length-1);
 			var newName = util.getUuid() + "." + fileName.split(".")[1];
+			var that = this;
 			this.removeProfileImg(newName, uuid + "/").then(function(){
-				$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory + uuid + "/", newName)
-				.then(function (success) {
-					// success
-					q.resolve(cordova.file.dataDirectory + uuid + "/" + newName);
-				}, function (error) {
-					q.reject(error);
-				});
+				that.checkDir(uuid).then(function(){
+					$cordovaFile.copyFile(oldDir, fileName, cordova.file.dataDirectory + uuid + "/", newName)
+					.then(function (success) {
+						// success
+						q.resolve(cordova.file.dataDirectory + uuid + "/" + newName);
+					}, function (error) {
+						q.reject(error);
+					});
+				}, function(){});
+				
 			}, function(){});
 			return q.promise;
 		},
@@ -769,8 +773,8 @@
 						//downloading paragraph images
 						var imgList = [];
 						article.paragraphs.map(function(p){
-							var imgs = p.img.split(",");
-							var txts = p.imgText.split(",");
+							var imgs = p.img.split(SG.delimiter);
+							var txts = p.imgText.split(SG.delimiter);
 							p.images = [];
 							for(var i=0; i<imgs.length; i++){
 								if(imgs[i] == ""){
@@ -782,7 +786,7 @@
 								options = {};
 								$cordovaFileTransfer.download(url, filePath, options, true);
 							}
-							var audios = p.audio.split(",");
+							var audios = p.audio.split(SG.delimiter);
 							p.sounds = [];
 							for(var i=0; i<audios.length; i++){
 								if(audios[i] == ""){
@@ -852,8 +856,8 @@
 							imgText.push(i.title || "");
 						});
 					}
-					para.img = img.join(",");
-					para.imgText = imgText.join(",");
+					para.img = img.join(SG.delimiter);
+					para.imgText = imgText.join(SG.delimiter);
 					var audio = [];
 					if(p.sounds){
 						p.sounds.map(function(s){
@@ -863,7 +867,7 @@
 							audioList.push({"fileName": fileName, "paragraph": p.uuid});
 						});
 					}
-					para.audio = audio.join(",");
+					para.audio = audio.join(SG.delimiter);
 					para.location = p.location;
 					article.paragraphs.push(para);
 				});
@@ -935,7 +939,7 @@
 	return {
 		getPicture: function(){
 			var options = { 
-		            quality : 75, 
+		            quality : 50, 
 		            destinationType : Camera.DestinationType.FILE_URL, 
 		            sourceType : Camera.PictureSourceType.CAMERA, 
 		            allowEdit : true,
@@ -956,12 +960,12 @@
 			return q.promise;
 		},
 		
-		selectPicture: function(){
+		selectPicture: function(pct){
 			var options = {
 				   maximumImagesCount: 10,
 				   width: 0,
 				   height: 0,
-				   quality: 80
+				   quality: pct || 60
 			};
 			var q = $q.defer();
 			$cordovaImagePicker.getPictures(options).then(function(results) {
@@ -977,6 +981,25 @@
 		captureImage : function(){
 			var options = { limit: 1 };
 			var q = $q.defer();
+			var options = { 
+		            quality : 60, 
+		            destinationType : Camera.DestinationType.FILE_URL, 
+		            sourceType : Camera.PictureSourceType.CAMERA, 
+		            allowEdit : false,
+		            encodingType: Camera.EncodingType.JPEG,
+		            targetWidth: 0,
+		            targetHeight: 0,
+		            popoverOptions: CameraPopoverOptions,
+		            saveToPhotoAlbum: false
+		        };
+			var q = $q.defer();
+			$cordovaCamera.getPicture(options).then(function(imageData) {
+				q.resolve(imageData);
+	        }, function(err) {
+	            // An error occured. Show a message to the user
+	        	q.reject(err);
+	        });
+			/*
 			$cordovaCapture.captureImage(options).then(function(imageData) {
 		      // Success! Image data is here
 				q.resolve(imageData);
@@ -984,7 +1007,7 @@
 		      // An error occurred. Show a message to the user
 	        	q.reject(err);
 		    });
-			
+			*/
 			return q.promise;
 		},
 		
