@@ -720,6 +720,19 @@
 			});
 			return q.promise;
 		},
+		searchArticles: function(query){
+			var q = $q.defer();
+			var url = util.server + "resource/searchbooks?query=" + query;
+			
+			$http.get(url,{headers:{'Accept': 'application/json;charset=UTF-8'},data:{}}).then(function(items){
+				
+				articles = items.data;
+				q.resolve(articles);
+			}, function(error){
+				q.reject(error);
+			});
+			return q.promise;
+		},
 		getMyArticles: function(){
 			var q = $q.defer();
 			var url = util.server + "books";

@@ -54,6 +54,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       templateUrl: 'templates/my-articles.html',
       controller: 'MyArticlesCtrl'
   })
+  .state('search',{
+	  cache: false,
+	  url: '/search/:id',
+      templateUrl: 'templates/article-list.html',
+      controller: 'ArticleListCtrl'
+  })
 
   // Each tab has its own nav history stack:
 

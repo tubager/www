@@ -1,0 +1,41 @@
+<ion-view>
+	<ion-nav-title>
+		<p>ËÑË÷½á¹û</p>
+	</ion-nav-title>
+	<ion-nav-buttons side="left">
+		<button class="button back-button button-icon ion-arrow-left-c header-item" ng-click="$ionicGoBack()">
+        </button>
+	</ion-nav-buttons>
+	<ion-content class="padding">
+      <ion-list>
+          <ion-item class="article-list" ng-repeat="a in articles" type="item-text-wrap">
+			  <div style="margin-top:-10px;">
+                  <div class="article-tile">
+					<div style="float: right;height:35px;">
+		   				<span>
+		   					<button class="button button-icon ion-android-create" style="margin-bottom: 15px" ng-click="editArticle(a)">
+        					</button>
+		   					<button class="button button-icon ion-android-remove-circle" ng-click="removeArticle(a.id)">
+        					</button>
+		   				</span>
+					</div>
+		   			<div style="clear:both;"></div>
+					<a href="#/timeline/{{a.id}}">
+						<div>
+						  <img class="full-image" src="{{a.coverImg}}">
+						  <div class="tile-text">
+							  <div class="tile-title">
+								  {{a.title}}
+							  </div>
+							  <div class="tile-sub-title">
+								{{a.description}}
+							  </div>
+						  </div>
+					  </div>
+					</a>
+                  </div>
+              </div>
+          </ion-item>
+      </ion-list>
+  </ion-content>
+</ion-view>

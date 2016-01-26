@@ -4,7 +4,9 @@
     $scope.sliders = Sliders.all();
     $scope.chats = Sliders.chats();
 	
-	
+	$scope.search = function(){
+		$state.go('search', {id: currentArticle.uuid});
+	}
 	
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
@@ -409,6 +411,18 @@
 
 		};
 	})
+.controller('ArticleListCtrl', function($scope, $ionicModal,ArticleService,$ionicPopup){
+	var query = $stateParams.id;
+	$scope.articles = [];
+	ArticleService.searchArticles(query).then(function(data){
+		$scope.articles = data;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	}, function(err){
+		alert(JSON.stringify(err));
+	});
+})
 .controller('MyArticlesCtrl', function($scope, $ionicModal,LocalFileService,$ionicPopup,$ionicActionSheet,CameraService){
 	var articleList = [];
 	//$scope.articles = [{title: "AAAAAAA", id: "1111", coverImg:"img/travel-default.png"}, {title: "BBBBBB", id: "222222", coverImg: "img/travel-default.png"}];
