@@ -514,7 +514,7 @@
 					if(!$scope.$$phase) {
 						$scope.$apply();
 					}
-					LocalFileService.saveArticleList($scope.articles);
+					LocalFileService.saveArticleList({articles: $scope.articles, currentArticle: $scope.currentArticle});
 				}, function(e){
 					
 				});
