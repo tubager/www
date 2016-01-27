@@ -5,6 +5,9 @@
     $scope.chats = Sliders.chats();
 	$scope.data = {query: ""};
 	$scope.search = function($event){
+		if(!$scope.data.query || $scope.data.query == ""){
+			return;
+		}
 		$state.go('search', {id: $scope.data.query});
 	};
 	
