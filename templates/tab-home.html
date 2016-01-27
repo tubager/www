@@ -3,9 +3,9 @@
 		<div id="search-bar">
             <div class="item item-input-inset" style="background-color:transparent;border-width:0px;margin-top:0px;padding:0px;">
                 <label class="item-input-wrapper" id="search-input" style="background-color:transparent;border:1px solid white;">
-                    <i class="icon ion-search placeholder-icon" style="color:white;"></i>
-                    <input type="text" placeholder="" ng-model="query" ng-change="search()">
+                    <input type="search" style="width:100%;" placeholder="" ng-model="data.query">
                 </label>
+                <button class="button button-clear ion-search" style="color:white; position:absolute;right:10px;" ng-click="search()"></button>
             </div>
         </div>
 	</ion-nav-title>

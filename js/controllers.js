@@ -1,12 +1,12 @@
 ﻿angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function ($scope,Sliders, $cordovaGeolocation, $cordovaNetwork, $ionicLoading, ArticleService,LocalFileService, FileService) {
+.controller('DashCtrl', function ($scope,$state,Sliders, $cordovaGeolocation, $cordovaNetwork, $ionicLoading, ArticleService,LocalFileService, FileService) {
     $scope.sliders = Sliders.all();
     $scope.chats = Sliders.chats();
-	
-	$scope.search = function(){
-		$state.go('search', {id: currentArticle.uuid});
-	}
+	$scope.data = {query: ""};
+	$scope.search = function($event){
+		$state.go('search', {id: $scope.data.query});
+	};
 	
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
@@ -411,7 +411,7 @@
 
 		};
 	})
-.controller('ArticleListCtrl', function($scope, $ionicModal,ArticleService,$ionicPopup){
+.controller('ArticleListCtrl', function($scope,$stateParams, $ionicModal,ArticleService,$ionicPopup){
 	var query = $stateParams.id;
 	$scope.articles = [];
 	ArticleService.searchArticles(query).then(function(data){
