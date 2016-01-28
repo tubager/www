@@ -973,12 +973,12 @@
 			return q.promise;
 		},
 		
-		selectPicture: function(pct){
+		selectPicture: function(){
 			var options = {
 				   maximumImagesCount: 10,
-				   width: 0,
-				   height: 0,
-				   quality: pct || 60
+				   width: 720,
+				   height: 720,
+				   quality: 100
 			};
 			var q = $q.defer();
 			$cordovaImagePicker.getPictures(options).then(function(results) {
@@ -995,13 +995,13 @@
 			var options = { limit: 1 };
 			var q = $q.defer();
 			var options = { 
-		            quality : 60, 
+		            quality : 80, 
 		            destinationType : Camera.DestinationType.FILE_URL, 
 		            sourceType : Camera.PictureSourceType.CAMERA, 
 		            allowEdit : false,
 		            encodingType: Camera.EncodingType.JPEG,
-		            targetWidth: 0,
-		            targetHeight: 0,
+		            targetWidth: 720,
+		            targetHeight: 720,
 		            popoverOptions: CameraPopoverOptions,
 		            saveToPhotoAlbum: false
 		        };
