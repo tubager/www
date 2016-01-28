@@ -955,8 +955,8 @@
   
 })
 
-.controller('ViewArticleCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicPopup) {
-  $scope.chat = {};
+.controller('ViewArticleCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicLoading) {
+    $scope.chat = {};
 	var articleId = $stateParams.id;
 	LocalFileService.readArticle(articleId).then(function(data){
 		$scope.chat = data;
@@ -967,6 +967,18 @@
 		alert(JSON.stringify(error));
 	});
 	
+	$scope.download = function(article){
+		if(article && article.uuid){
+			$ionicLoading.show({
+				template: '<ion-spinner icon="bubbles"></ion-spinner><br/>正在下载!'
+			});
+			ArticleService.downloadArticle(article.uuid).then(function(){
+				$ionicLoading.hide();
+			},function(){
+				$ionicLoading.hide();
+			});
+		}
+	};
 })
 
 .controller('TimelineCtrl', function($scope, $state, $stateParams, $ionicModal, $ionicActionSheet, ArticleService, FileService, LocalFileService,$ionicPopup, $ionicLoading) {
@@ -1043,6 +1055,19 @@
     }).then(function(modal) {
       $scope.modal = modal;
     });
+	
+	$scope.download = function(article){
+		if(article && article.uuid){
+			$ionicLoading.show({
+				template: '<ion-spinner icon="bubbles"></ion-spinner><br/>正在下载!'
+			});
+			ArticleService.downloadArticle(article.uuid).then(function(){
+				$ionicLoading.hide();
+			},function(){
+				$ionicLoading.hide();
+			});
+		}
+	};
 	
 	$scope.upload = function(article){
 		var loggedIn = util.isLoggedIn();

@@ -24,8 +24,8 @@
       <ion-list class="article-list">
           <ion-item class="" ng-repeat="chat in chats" type="item-text-wrap" href="#/viewarticle/{{chat.uuid}}">
               <div class="">
-                  <div class="article-tile">
-                      <img class="full-image" src="{{chat.coverImg}}">
+                  <div class="article-tile" style="min-height:100px;">
+                      <img class="full-image" src="{{chat.coverImg}}" alt="{{chat.coverImg}}" style="min-height:100px;">
                       <div class="tile-text">
 	                      <div class="tile-title">
 	                          {{chat.title}}

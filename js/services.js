@@ -24,7 +24,7 @@
         id: 0,
         title: '【东京北海道】初夏花未央',
         description: '晓稀 ',
-        coverImg: 'http://d.3987.com/jlrm_140107/002.jpg'
+        coverImg: 'img/banners/2.jpg'
     }, {
         id: 1,
         title: '【天空之城】阳春三月 携死党．奔赴女儿国（完结）',
