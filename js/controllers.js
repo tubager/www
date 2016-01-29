@@ -101,6 +101,13 @@
 	.controller('SignInCtrl', function ($scope, LoginService, $ionicPopup, $state,LocalFileService, FileService, $ionicLoading) {
 		$scope.user = {};
 		$scope.submitted = false;
+		
+		$scope.register = function(){
+			$state.go('signup');
+		};
+		$scope.claimPassword = function(){
+			$state.go('forgotpassword');
+		};
 
 		$scope.signIn = function () {
 			$ionicLoading.show({
@@ -131,7 +138,7 @@
 				$ionicLoading.hide();
 				$ionicPopup.alert({
 					title: '登录失败!',
-					template: error.data.message
+					template: CS[error.data.message] || ""
 				});
 			});
 		};
@@ -1253,24 +1260,29 @@
 		var myArticles = [];
 		LocalFileService.listArticles().then(function(data){
 			myArticles = data.articles;
+			var idx = 0;
 			ArticleService.getMyArticles().then(function(list){
-				$ionicLoading.hide();
+				//$ionicLoading.hide();
 				list.map(function(d){
 					for(var i=0; i<myArticles.length; i++){
 						if(myArticles[i].id == d.uuid || myArticles[i].uuid == d.uuid){
 							return;
 						}
 					}
-					$ionicLoading.show({
-						template: '<ion-spinner icon="bubbles"></ion-spinner><br/>正在下载"' + d.title + '"'
-					});
+					idx++;
 					ArticleService.downloadArticle(d.uuid).then(function(article){
 						myArticles.push({'id': article.uuid, 'title': article.title, 'description': article.description, 'coverImg': article.coverImg});
 						data.articles = myArticles;
 						LocalFileService.saveArticleList(data);
-						$ionicLoading.hide();
+						idx--;
+						if(idx <= 0){
+							$ionicLoading.hide();
+						}
 					}, function(){
-						$ionicLoading.hide();
+						idx--;
+						if(idx <= 0){
+							$ionicLoading.hide();
+						}
 					});
 				});
 			}, function(){
