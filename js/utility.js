@@ -1,6 +1,7 @@
 var util = {
 	getUuid: function(){
-		return (new Date()).toJSON().replace(/-/g,"").replace(/:/g,"").replace(".","") + Math.ceil(Math.random()*100);
+		var d = new Date();
+		return (new Date(d.getTime() - d.getTimezoneOffset()*60*1000)).toJSON().replace(/-/g,"").replace(/:/g,"").replace(".","") + Math.ceil(Math.random()*100);
 	},
 	profile: {
 		userName: "",

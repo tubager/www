@@ -22,13 +22,11 @@
 	   	<div class="tbg-p" ng-repeat="p in chat.paragraphs" type="item-text-wrap">
 	   		<div class="tbg-p-header">
 		   		<div class="tbg-p-title">{{p.title}}</div>
-		   		<div style="margin-bottom: -30px;margin-top:-10px;">
-		   			<div class="tbg-p-time" style="float: left;margin-top:13px;">{{p.timestamp? p.timestamp.split(".")[0].replace("T", " ") :""}}</div>
-		   			
-		   			<div style="clear:both;"></div>
+		   		<div style="">
+		   			<div class="tbg-p-time" style="">{{p.uuid? p.uuid.substr(1,4)+"-"+p.uuid.substr(5,2)+"-"+p.uuid.substr(7,2) :""}}</div>
 		   		</div>
 	   		</div>
-	   		<div class="tbg-p-divider"></div>
+	   		<div class="tbg-p-divider" style="display:none;"></div>
 	   		<div class="tbg-p-body">
 		   		<div class="" ng-repeat="img in p.images" type="item-text-wrap">
 		   			<img src="{{img.url}}" style="max-width:100%;"/>
