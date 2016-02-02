@@ -32,7 +32,7 @@ var util = {
 		}
 		return true;
 	},
-	server: "http://139.196.175.154:8080/"
+	server: "http://app.tubager.com/"
 	//server: "http://120.25.68.228:8080/"
 	//server: "http://localhost:8080/"
 };
