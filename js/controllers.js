@@ -406,7 +406,7 @@
 					}
 					else if(index == 1){
 						//select from album
-						CameraService.selectPicture().then(function(results) {
+						CameraService.selectPicture(300,300,90,1).then(function(results) {
 						    LocalFileService.copyProfileImg(results[0]).then(function(url){
 								$scope.user.img = url;
 								saveProfile();
@@ -475,7 +475,7 @@
 			buttonClicked: function (index) {
 				if(index == 0){
 					//taking photo
-					CameraService.captureImage().then(function(mediaFiles) {
+					CameraService.captureImage(util.img.width,util.img.height,util.img.quality).then(function(mediaFiles) {
 						$scope.data.coverImg = mediaFiles;//[0].fullPath;
 					}, function(err) {
 						alert(err);
@@ -483,7 +483,7 @@
 				}
 				else if(index == 1){
 					//select from album
-					CameraService.selectPicture().then(function(results) {
+					CameraService.selectPicture(util.img.width,util.img.height,util.img.quality,1).then(function(results) {
 						$scope.data.coverImg = results[0];
 					}, function(err) {
 						alert(err);
@@ -740,7 +740,7 @@
 			buttonClicked: function (index) {
 				if(index == 0){
 					//taking photo
-					CameraService.captureImage().then(function(mediaFiles) {
+					CameraService.captureImage(util.img.width,util.img.height,util.img.quality).then(function(mediaFiles) {
 						$scope.data.coverImg = mediaFiles;//[0].fullPath;
 					}, function(err) {
 						alert(err);
@@ -748,7 +748,7 @@
 				}
 				else if(index == 1){
 					//select from album
-					CameraService.selectPicture().then(function(results) {
+					CameraService.selectPicture(util.img.width,util.img.height,util.img.quality,1).then(function(results) {
 						$scope.data.coverImg = results[0];
 					}, function(err) {
 						alert(err);
@@ -774,7 +774,28 @@
     });
 	
 	$scope.openSelect = function(){
-		$scope.modal.show();
+		//$scope.modal.show();
+		$ionicActionSheet.show({
+			buttons: [
+				{ text: '<i class="icon ion-camera"></i>拍照片' },
+				{ text: '<i class="icon ion-images"></i>从相册选取' }
+			],
+			cancelText: '取消',
+			cancel: function () {
+				// add cancel code..
+			},
+			buttonClicked: function (index) {
+				if(index == 0){
+					//taking photo
+					captureImage();
+				}
+				else if(index == 1){
+					//select from album
+					selectPhoto();
+				}
+				return true;
+			}
+		});
 	};
 	
 	$scope.closeSelect = function(){
@@ -785,9 +806,9 @@
 		$scope.titleModel.hide();
 	};
 	
-	$scope.selectPhoto = function(){
+	function selectPhoto(){
 		$scope.modal.hide();
-	    CameraService.selectPicture().then(function(results) {
+	    CameraService.selectPicture(util.img.width,util.img.height,util.img.quality,5).then(function(results) {
 		  for (var i = 0; i < results.length; i++) {
 	        //alert('Image URI: ' + results[i]);
 	        $scope.images.push({'url':results[i], 'title': ''});
@@ -800,9 +821,9 @@
 	    });
     };
 	
-	$scope.captureImage = function(){
+	function captureImage(){
 		$scope.modal.hide();
-	    CameraService.captureImage().then(function(mediaFiles) {
+	    CameraService.captureImage(util.img.width,util.img.height,util.img.quality).then(function(mediaFiles) {
 			$scope.images.push({'url':mediaFiles, 'title':''});
 			if(!$scope.$$phase) {
 				$scope.$apply();
@@ -902,7 +923,7 @@
   };
   
   $scope.captureImage = function(){
-	  CameraService.captureImage().then(function(mediaFiles) {
+	  CameraService.captureImage(util.img.width,util.img.height,util.img.quality).then(function(mediaFiles) {
 		    var i, path, len;
 		    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
 		        path = mediaFiles[i].fullPath;

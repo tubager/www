@@ -23,6 +23,11 @@ var util = {
 		img: "img/img_5236.jpg",
 		token: null
 	},
+	img: {
+		width: 640,
+		height: 640,
+		quality: 100
+	},
 	isLoggedIn: function(){
 		if(!util.profile.token){
 			return false;

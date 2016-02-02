@@ -973,12 +973,12 @@
 			return q.promise;
 		},
 		
-		selectPicture: function(){
+		selectPicture: function(maxWidth, maxHeight, quality, count){
 			var options = {
-				   maximumImagesCount: 10,
-				   width: 720,
-				   height: 720,
-				   quality: 100
+				   maximumImagesCount: count || 10,
+				   width: maxWidth || 640,
+				   height: maxHeight || 640,
+				   quality: quality || 100
 			};
 			var q = $q.defer();
 			$cordovaImagePicker.getPictures(options).then(function(results) {
@@ -991,17 +991,17 @@
 			return q.promise;
 		},
 		
-		captureImage : function(){
+		captureImage : function(maxWidth, maxHeight, quality){
 			var options = { limit: 1 };
 			var q = $q.defer();
 			var options = { 
-		            quality : 80, 
+		            quality : quality || 100, 
 		            destinationType : Camera.DestinationType.FILE_URL, 
 		            sourceType : Camera.PictureSourceType.CAMERA, 
 		            allowEdit : false,
 		            encodingType: Camera.EncodingType.JPEG,
-		            targetWidth: 720,
-		            targetHeight: 720,
+		            targetWidth: maxWidth || 640,
+		            targetHeight: maxHeight || 640,
 		            popoverOptions: CameraPopoverOptions,
 		            saveToPhotoAlbum: false
 		        };
