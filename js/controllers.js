@@ -40,24 +40,35 @@
 			}
 			getLocalArticles();
 			uploadLocation();
-			 ArticleService.getArticles().then(function(data){
-				 data.map(function(d){
-					 for(var i=0; i<$scope.chats.length; i++){
-						 if($scope.chats[i].uuid == d.uuid){
-							 return;
+			
+			LocalFileService.listArticles().then(function(myArticleData){
+				var myArticles = myArticleData.articles;
+				ArticleService.getArticles().then(function(data){
+					 data.map(function(d){
+						 for(var i=0; i<myArticles.length; i++){
+							 if(myArticles[i].uuid == d.uuid){
+								 return;
+							 }
 						 }
-					 }
-					 //d.coverImg = util.server + "resource/filebyname?name=" + d.coverImg;
-					 ArticleService.downloadArticle(d.uuid).then(function(article){
-						LocalFileService.updateLocalArticles(article, "add").then(function(data){
-							getLocalArticles();
-						}, function(error){
-							
-						});
-					 }, function(){});
-				 });
-			}, function(error){
+						 for(var i=0; i<$scope.chats.length; i++){
+							 if($scope.chats[i].uuid == d.uuid){
+								 return;
+							 }
+						 }
+						 //d.coverImg = util.server + "resource/filebyname?name=" + d.coverImg;
+						 ArticleService.downloadArticle(d.uuid).then(function(article){
+							LocalFileService.updateLocalArticles(article, "add").then(function(data){
+								getLocalArticles();
+							}, function(error){
+								
+							});
+						 }, function(){});
+					 });
+				}, function(error){
+				});
 			});
+			
+			 
 		}, function(error){
 		});
     }
@@ -79,7 +90,7 @@
 			return;
 		}
 		
-		if(!util.profile.techId){
+		if(!util.isLoggedIn){
 			return;
 		}
 		LocalFileService.readGPS().then(function(gpsData){
@@ -87,7 +98,7 @@
 			if(txt == null || txt == ""){
 				return;
 			}
-			var data = {"techId": util.profile.techId, "text": txt};
+			var data = {"techId": util.profile.userName, "text": txt};
 			FileService.uploadGps(data).then(function(success){
 				LocalFileService.clearGps();
 			}, function(){});

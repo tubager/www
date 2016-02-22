@@ -20,27 +20,7 @@
         img: 'img/banners/4.jpg'
     }];
 
-    var chats = [{
-        id: 0,
-        title: '【东京北海道】初夏花未央',
-        description: '晓稀 ',
-        coverImg: 'img/banners/2.jpg'
-    }, {
-        id: 1,
-        title: '【天空之城】阳春三月 携死党．奔赴女儿国（完结）',
-        description: '天空之城',
-        coverImg: 'img/banners/2.jpg'
-    }, {
-        id: 2,
-        title: '#消夏计划#I TAIWAN臺灣向南走向北走',
-        description: 'ar_vinny ',
-        coverImg: 'img/banners/3.jpg'
-    }, {
-        id: 3,
-        title: '沙丁鱼大迁徙－狂野南非 海盗王.基德作品',
-        description: '海盗王基德',
-        coverImg: 'img/banners/4.jpg'
-    }];
+    var chats = [];
 
     return {
         all: function () {
@@ -960,7 +940,7 @@
 		            targetWidth: 300,
 		            targetHeight: 300,
 		            popoverOptions: CameraPopoverOptions,
-		            saveToPhotoAlbum: false
+		            saveToPhotoAlbum: true
 		        };
 			var q = $q.defer();
 			$cordovaCamera.getPicture(options).then(function(imageData) {
@@ -1003,7 +983,7 @@
 		            targetWidth: maxWidth || 640,
 		            targetHeight: maxHeight || 640,
 		            popoverOptions: CameraPopoverOptions,
-		            saveToPhotoAlbum: false
+		            saveToPhotoAlbum: true
 		        };
 			var q = $q.defer();
 			$cordovaCamera.getPicture(options).then(function(imageData) {
